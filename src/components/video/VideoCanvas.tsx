@@ -6,19 +6,58 @@ import { useDrawing } from '../../hooks/useDrawing';
 import { usePenDrawing } from '../../hooks/usePenDrawing';
 import { useAngleMeasurement } from '../../hooks/useAngleMeasurement';
 import { DrawingEngine } from '../../services/drawingEngine';
-import { drawArrow, drawFreePath, drawAngleMeasurement } from '../../utils/canvas';
+import { drawArrow, drawFreePath, drawAngleMeasurement, getVideoDisplayArea } from '../../utils/canvas';
 
 const VideoCanvas: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { videoRef, videoState } = useVideo();
-  const { annotations, getAnnotationsForTime, removeArrow, removeFreeDraw, removeAngle } = useAnnotations();
-  const { activeTool, toolSettings } = useTool();
+  const { annotations, getAnnotationsForTime, removeArrow, removeFreeDraw, removeAngle, setReferenceLines } = useAnnotations();
+  const { activeTool, toolSettings, setActiveTool } = useTool();
   const drawingEngineRef = useRef<DrawingEngine | null>(null);
   const [hoveredAnnotation, setHoveredAnnotation] = React.useState<{ type: 'arrow' | 'drawing' | 'angle'; id: string } | null>(null);
 
   const arrowDrawing = useDrawing(canvasRef, 0);
   const penDrawing = usePenDrawing(canvasRef, 0);
   const angleMeasurement = useAngleMeasurement(canvasRef, 0);
+
+  // Handle waterline setup click
+  const handleWaterlineClick = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    const video = videoRef.current;
+    if (!canvas || !video) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const scaleY = canvas.height / rect.height;
+    const clickY = (e.clientY - rect.top) * scaleY;
+
+    // Calculate video display area
+    const videoArea = getVideoDisplayArea(video, canvas.width, canvas.height);
+
+    // Calculate Y position as percentage within video area
+    const relativeY = clickY - videoArea.y;
+    const yPercent = Math.max(0, Math.min(100, (relativeY / videoArea.height) * 100));
+
+    // Add horizontal reference line at clicked position
+    const waterline: ReferenceLine = {
+      id: 'waterline',
+      type: 'horizontal',
+      position: yPercent,
+      color: '#3b82f6', // blue
+      thickness: 3,
+    };
+
+    // Save to existing reference lines, replacing any existing waterline
+    const otherLines = annotations.referenceLines.filter(line => line.id !== 'waterline');
+    setReferenceLines([...otherLines, waterline]);
+
+    // Save to localStorage
+    localStorage.setItem('aquaflux_waterline', JSON.stringify({ yPercent }));
+
+    // Deactivate tool after setting
+    setActiveTool(null);
+
+    alert(`수면 위치가 설정되었습니다 (${yPercent.toFixed(1)}%)`);
+  }, [videoRef, annotations.referenceLines, setReferenceLines, setActiveTool]);
 
   // Handle eraser click
   const handleEraserClick = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -123,11 +162,37 @@ const VideoCanvas: React.FC = () => {
 
     const render = () => {
       const ctx = drawingEngine.getContext();
+      const video = videoRef.current;
       drawingEngine.clear();
 
-      // Draw reference lines
-      if (annotations.referenceLines.length > 0) {
-        drawingEngine.drawReferenceLines(annotations.referenceLines);
+      // Draw reference lines within video display area only
+      if (annotations.referenceLines.length > 0 && video) {
+        const videoArea = getVideoDisplayArea(video, canvas.width, canvas.height);
+
+        ctx.save();
+        annotations.referenceLines.forEach((line) => {
+          if (line.type === 'horizontal') {
+            const y = videoArea.y + (line.position / 100) * videoArea.height;
+            ctx.strokeStyle = line.color;
+            ctx.lineWidth = line.thickness;
+            ctx.setLineDash([10, 5]);
+            ctx.beginPath();
+            ctx.moveTo(videoArea.x, y);
+            ctx.lineTo(videoArea.x + videoArea.width, y);
+            ctx.stroke();
+          } else {
+            const x = videoArea.x + (line.position / 100) * videoArea.width;
+            ctx.strokeStyle = line.color;
+            ctx.lineWidth = line.thickness;
+            ctx.setLineDash([10, 5]);
+            ctx.beginPath();
+            ctx.moveTo(x, videoArea.y);
+            ctx.lineTo(x, videoArea.y + videoArea.height);
+            ctx.stroke();
+          }
+        });
+        ctx.setLineDash([]);
+        ctx.restore();
       }
 
       // Draw saved annotations for current timestamp (only for Before video - videoIndex 0 or undefined)
@@ -251,6 +316,7 @@ const VideoCanvas: React.FC = () => {
   const getCursorStyle = () => {
     if (activeTool === 'arrow' || activeTool === 'pen' || activeTool === 'angle') return 'crosshair';
     if (activeTool === 'eraser') return 'pointer';
+    if (activeTool === 'set-waterline') return 'crosshair';
     return 'default';
   };
 
@@ -260,6 +326,7 @@ const VideoCanvas: React.FC = () => {
     else if (activeTool === 'pen') penDrawing.handleMouseDown(e);
     else if (activeTool === 'angle') angleMeasurement.handleClick(e);
     else if (activeTool === 'eraser') handleEraserClick(e);
+    else if (activeTool === 'set-waterline') handleWaterlineClick(e);
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {

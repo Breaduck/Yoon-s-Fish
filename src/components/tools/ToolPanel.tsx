@@ -106,6 +106,18 @@ const ToolPanel: React.FC = () => {
         >
           각도기
         </button>
+
+        <button
+          onClick={() => setActiveTool(activeTool === 'set-waterline' ? null : 'set-waterline')}
+          className={`w-full px-5 py-3.5 rounded-xl text-left font-semibold transition-all ${
+            activeTool === 'set-waterline'
+              ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-lg shadow-cyan-500/30'
+              : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+          }`}
+          title="수면 위치를 클릭해서 설정"
+        >
+          수면 설정
+        </button>
       </div>
 
       {/* Reference Lines Settings */}

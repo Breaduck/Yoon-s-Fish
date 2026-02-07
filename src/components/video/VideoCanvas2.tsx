@@ -6,7 +6,7 @@ import { useDrawing } from '../../hooks/useDrawing';
 import { usePenDrawing } from '../../hooks/usePenDrawing';
 import { useAngleMeasurement } from '../../hooks/useAngleMeasurement';
 import { DrawingEngine } from '../../services/drawingEngine';
-import { drawArrow, drawFreePath, drawAngleMeasurement } from '../../utils/canvas';
+import { drawArrow, drawFreePath, drawAngleMeasurement, getVideoDisplayArea } from '../../utils/canvas';
 
 const VideoCanvas2: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -121,11 +121,37 @@ const VideoCanvas2: React.FC = () => {
 
     const render = () => {
       const ctx = drawingEngine.getContext();
+      const video = videoRef2.current;
       drawingEngine.clear();
 
-      // Draw reference lines
-      if (annotations.referenceLines.length > 0) {
-        drawingEngine.drawReferenceLines(annotations.referenceLines);
+      // Draw reference lines within video display area only
+      if (annotations.referenceLines.length > 0 && video) {
+        const videoArea = getVideoDisplayArea(video, canvas.width, canvas.height);
+
+        ctx.save();
+        annotations.referenceLines.forEach((line) => {
+          if (line.type === 'horizontal') {
+            const y = videoArea.y + (line.position / 100) * videoArea.height;
+            ctx.strokeStyle = line.color;
+            ctx.lineWidth = line.thickness;
+            ctx.setLineDash([10, 5]);
+            ctx.beginPath();
+            ctx.moveTo(videoArea.x, y);
+            ctx.lineTo(videoArea.x + videoArea.width, y);
+            ctx.stroke();
+          } else {
+            const x = videoArea.x + (line.position / 100) * videoArea.width;
+            ctx.strokeStyle = line.color;
+            ctx.lineWidth = line.thickness;
+            ctx.setLineDash([10, 5]);
+            ctx.beginPath();
+            ctx.moveTo(x, videoArea.y);
+            ctx.lineTo(x, videoArea.y + videoArea.height);
+            ctx.stroke();
+          }
+        });
+        ctx.setLineDash([]);
+        ctx.restore();
       }
 
       // Draw saved annotations for current timestamp (only for After video - videoIndex 1)

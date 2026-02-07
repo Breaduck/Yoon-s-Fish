@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { ArrowStyle } from '../types/drawing';
 
-export type ToolType = 'reference-lines' | 'arrow' | 'pen' | 'eraser' | 'angle' | null;
+export type ToolType = 'reference-lines' | 'arrow' | 'pen' | 'eraser' | 'angle' | 'set-waterline' | null;
 
 interface ToolSettings {
   color: string;

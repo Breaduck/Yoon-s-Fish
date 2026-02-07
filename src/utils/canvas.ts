@@ -20,9 +20,11 @@ export const drawArrow = (
   ctx.lineWidth = thickness;
   ctx.lineCap = 'round';
 
-  // Set dash pattern for dashed arrows
+  // Set dash pattern for dashed arrows (scale with thickness)
   if (style === 'dashed') {
-    ctx.setLineDash([10, 5]);
+    const dashLength = Math.max(15, thickness * 4);
+    const gapLength = Math.max(10, thickness * 2.5);
+    ctx.setLineDash([dashLength, gapLength]);
   }
 
   // Draw line
@@ -218,4 +220,41 @@ export const clearCanvas = (
   height: number
 ) => {
   ctx.clearRect(0, 0, width, height);
+};
+
+/**
+ * Calculate the actual video display area within canvas (object-contain)
+ */
+export const getVideoDisplayArea = (
+  videoElement: HTMLVideoElement,
+  canvasWidth: number,
+  canvasHeight: number
+): { x: number; y: number; width: number; height: number } => {
+  const videoWidth = videoElement.videoWidth;
+  const videoHeight = videoElement.videoHeight;
+
+  if (!videoWidth || !videoHeight) {
+    return { x: 0, y: 0, width: canvasWidth, height: canvasHeight };
+  }
+
+  const videoAspect = videoWidth / videoHeight;
+  const canvasAspect = canvasWidth / canvasHeight;
+
+  let displayWidth, displayHeight, x, y;
+
+  if (videoAspect > canvasAspect) {
+    // Video is wider - fit to width, letterbox top/bottom
+    displayWidth = canvasWidth;
+    displayHeight = canvasWidth / videoAspect;
+    x = 0;
+    y = (canvasHeight - displayHeight) / 2;
+  } else {
+    // Video is taller - fit to height, pillarbox left/right
+    displayHeight = canvasHeight;
+    displayWidth = canvasHeight * videoAspect;
+    x = (canvasWidth - displayWidth) / 2;
+    y = 0;
+  }
+
+  return { x, y, width: displayWidth, height: displayHeight };
 };
