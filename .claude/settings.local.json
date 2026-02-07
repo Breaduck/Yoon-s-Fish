@@ -13,7 +13,8 @@
       "Bash(git branch:*)",
       "Bash(git push:*)",
       "Bash(done)",
-      "Bash(python -m http.server:*)"
+      "Bash(python -m http.server:*)",
+      "Bash(wrangler pages deploy:*)"
     ]
   }
 }
