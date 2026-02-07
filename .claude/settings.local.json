@@ -12,7 +12,8 @@
       "Bash(git commit:*)",
       "Bash(git branch:*)",
       "Bash(git push:*)",
-      "Bash(done)"
+      "Bash(done)",
+      "Bash(python -m http.server:*)"
     ]
   }
 }
