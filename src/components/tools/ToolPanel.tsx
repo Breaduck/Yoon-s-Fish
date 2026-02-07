@@ -113,24 +113,24 @@ const ToolPanel: React.FC = () => {
       {activeTool === 'arrow' && (
         <div className="space-y-5 pt-5 border-t border-gray-200">
           <div>
-            <label className="block text-sm text-gray-400 mb-2">스타일</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">스타일</label>
             <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={() => updateToolSettings({ arrowStyle: 'solid' })}
-                className={`px-3 py-2 rounded text-sm ${
+                className={`px-3 py-2 rounded-lg text-sm font-semibold transition-all ${
                   toolSettings.arrowStyle === 'solid'
-                    ? 'bg-emerald-600 text-white'
-                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
                 실선
               </button>
               <button
                 onClick={() => updateToolSettings({ arrowStyle: 'dashed' })}
-                className={`px-3 py-2 rounded text-sm ${
+                className={`px-3 py-2 rounded-lg text-sm font-semibold transition-all ${
                   toolSettings.arrowStyle === 'dashed'
-                    ? 'bg-emerald-600 text-white'
-                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
                 점선
@@ -139,7 +139,7 @@ const ToolPanel: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-sm text-gray-400 mb-2">색상</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-3">색상</label>
             <div className="grid grid-cols-4 gap-2">
               {COLOR_OPTIONS.map((color) => (
                 <button
@@ -158,21 +158,25 @@ const ToolPanel: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-sm text-gray-400 mb-2">굵기</label>
-            <div className="space-y-1">
-              {THICKNESS_OPTIONS.map((option) => (
+            <div className="flex items-center justify-between gap-2">
+              <label className="text-sm font-semibold text-gray-700">
+                굵기
+              </label>
+              <div className="flex items-center gap-2">
                 <button
-                  key={option.value}
-                  onClick={() => updateToolSettings({ thickness: option.value })}
-                  className={`w-full px-3 py-2 rounded text-sm text-left ${
-                    toolSettings.thickness === option.value
-                      ? 'bg-emerald-600 text-white'
-                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                  }`}
+                  onClick={() => updateToolSettings({ thickness: Math.max(1, toolSettings.thickness - 1) })}
+                  className="w-8 h-8 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-bold transition-all"
                 >
-                  {option.label}
+                  -
                 </button>
-              ))}
+                <span className="w-8 text-center text-sm font-bold text-gray-800">{toolSettings.thickness}</span>
+                <button
+                  onClick={() => updateToolSettings({ thickness: Math.min(10, toolSettings.thickness + 1) })}
+                  className="w-8 h-8 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-bold transition-all"
+                >
+                  +
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -201,17 +205,26 @@ const ToolPanel: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-3">
-              펜 굵기: <span className="text-blue-600">{toolSettings.penThickness}</span>
-            </label>
-            <input
-              type="range"
-              min="1"
-              max="20"
-              value={toolSettings.penThickness}
-              onChange={(e) => updateToolSettings({ penThickness: parseInt(e.target.value) })}
-              className="w-full h-2 bg-gray-200 rounded-full appearance-none cursor-pointer accent-blue-500"
-            />
+            <div className="flex items-center justify-between gap-2">
+              <label className="text-sm font-semibold text-gray-700">
+                굵기
+              </label>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => updateToolSettings({ penThickness: Math.max(1, toolSettings.penThickness - 1) })}
+                  className="w-8 h-8 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-bold transition-all"
+                >
+                  -
+                </button>
+                <span className="w-8 text-center text-sm font-bold text-gray-800">{toolSettings.penThickness}</span>
+                <button
+                  onClick={() => updateToolSettings({ penThickness: Math.min(20, toolSettings.penThickness + 1) })}
+                  className="w-8 h-8 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-bold transition-all"
+                >
+                  +
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

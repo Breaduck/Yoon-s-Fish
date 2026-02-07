@@ -175,21 +175,36 @@ export const drawAngleMeasurement = (
     ctx.fill();
   });
 
-  // Draw arc at vertex
-  const radius = 30;
+  // Draw arc at vertex (inner angle)
+  const radius = 40;
   const angle1 = Math.atan2(p1.y - p2.y, p1.x - p2.x);
   const angle2 = Math.atan2(p3.y - p2.y, p3.x - p2.x);
 
+  // Calculate angle difference to determine direction
+  let angleDiff = angle2 - angle1;
+  if (angleDiff > Math.PI) angleDiff -= 2 * Math.PI;
+  if (angleDiff < -Math.PI) angleDiff += 2 * Math.PI;
+  const anticlockwise = angleDiff < 0;
+
+  // Draw filled arc for inner angle
   ctx.beginPath();
-  ctx.arc(p2.x, p2.y, radius, angle1, angle2, angle1 > angle2);
+  ctx.moveTo(p2.x, p2.y);
+  ctx.arc(p2.x, p2.y, radius, angle1, angle2, anticlockwise);
+  ctx.closePath();
+  ctx.fillStyle = color + '33'; // Semi-transparent fill
+  ctx.fill();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 3;
   ctx.stroke();
 
   // Draw angle text
-  const midAngle = (angle1 + angle2) / 2;
-  const textX = p2.x + Math.cos(midAngle) * (radius + 20);
-  const textY = p2.y + Math.sin(midAngle) * (radius + 20);
+  const midAngle = anticlockwise
+    ? angle1 + (angle2 - angle1 - 2 * Math.PI) / 2
+    : angle1 + (angle2 - angle1) / 2;
+  const textX = p2.x + Math.cos(midAngle) * (radius + 25);
+  const textY = p2.y + Math.sin(midAngle) * (radius + 25);
 
-  drawTextWithBackground(ctx, `${angle}°`, textX, textY, '#fff', color + 'cc');
+  drawTextWithBackground(ctx, `${angle}°`, textX, textY, '#fff', color + 'ee');
 
   ctx.restore();
 };
