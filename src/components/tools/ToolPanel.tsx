@@ -11,6 +11,7 @@ const ToolPanel: React.FC = () => {
   const handleReset = () => {
     resetSettings();
     clearDrawings();
+    setReferenceLines([]);
   };
 
   const handleReferenceLinesToggle = () => {

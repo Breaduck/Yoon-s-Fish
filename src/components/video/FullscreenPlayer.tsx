@@ -17,13 +17,14 @@ const FullscreenPlayer: React.FC = () => {
   useEffect(() => {
     const handleFullscreenChange = () => {
       if (!document.fullscreenElement) {
+        const shouldPlay = wasPlayingRef.current;
         setIsFullscreen(false);
         // Restore playing state after exiting fullscreen
-        if (wasPlayingRef.current) {
-          // Small delay to ensure fullscreen transition is complete
+        if (shouldPlay) {
+          // Longer delay to ensure fullscreen transition is complete
           setTimeout(() => {
             play();
-          }, 100);
+          }, 300);
         }
       }
     };
