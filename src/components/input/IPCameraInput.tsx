@@ -41,10 +41,10 @@ const IPCameraInput: React.FC = () => {
 
       {showModal && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
-          style={{ zIndex: 999999 }}
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4"
+          style={{ zIndex: 999999, overflow: 'auto' }}
         >
-          <div className="bg-white rounded-3xl p-6 shadow-2xl max-w-2xl w-full mx-4" style={{ maxHeight: '80vh', overflowY: 'auto' }}>
+          <div className="bg-white rounded-3xl p-6 shadow-2xl max-w-2xl w-full my-auto" style={{ maxHeight: '90vh', overflowY: 'auto' }}>
             <h3 className="text-xl font-bold text-gray-800 mb-6">IP 카메라 연결</h3>
 
             {/* Authentication */}
