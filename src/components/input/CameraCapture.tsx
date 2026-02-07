@@ -34,14 +34,14 @@ const CameraCapture: React.FC = () => {
           onClick={handleStartCamera}
           className="px-5 py-2.5 bg-gradient-to-r from-blue-500 to-cyan-500 hover:shadow-lg text-white rounded-xl font-semibold transition-all shadow-md shadow-blue-500/30"
         >
-          📸 카메라 시작
+          카메라 시작
         </button>
       ) : (
         <button
           onClick={handleStopCamera}
           className="px-5 py-2.5 bg-gradient-to-r from-red-500 to-pink-500 hover:shadow-lg text-white rounded-xl font-semibold transition-all shadow-md shadow-red-500/30"
         >
-          ⏹️ 카메라 중지
+          카메라 중지
         </button>
       )}
     </div>

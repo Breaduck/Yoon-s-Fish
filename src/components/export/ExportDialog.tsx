@@ -23,7 +23,7 @@ const ExportDialog: React.FC = () => {
         onClick={() => setIsOpen(true)}
         className="px-5 py-2.5 bg-gradient-to-r from-purple-500 to-pink-500 hover:shadow-lg text-white rounded-xl font-semibold transition-all shadow-md shadow-purple-500/30"
       >
-        💾 영상 내보내기
+        영상 내보내기
       </button>
     );
   }

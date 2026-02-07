@@ -44,30 +44,68 @@ const ReferenceLines: React.FC = () => {
     <div className="space-y-5 pt-5 border-t border-gray-200">
       <div>
         <label className="block text-sm font-semibold text-gray-700 mb-3">
-          수평선 개수: <span className="text-blue-600">{toolSettings.lineCount}</span>
+          수평선 개수
         </label>
-        <input
-          type="range"
-          min="2"
-          max="10"
-          value={toolSettings.lineCount}
-          onChange={(e) => updateToolSettings({ lineCount: parseInt(e.target.value) })}
-          className="w-full h-2 bg-gray-200 rounded-full appearance-none cursor-pointer accent-blue-500"
-        />
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => updateToolSettings({ lineCount: Math.max(2, toolSettings.lineCount - 1) })}
+            className="w-10 h-10 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-bold transition-all"
+          >
+            -
+          </button>
+          <input
+            type="number"
+            min="2"
+            max="10"
+            value={toolSettings.lineCount}
+            onChange={(e) => {
+              const value = parseInt(e.target.value);
+              if (!isNaN(value) && value >= 2 && value <= 10) {
+                updateToolSettings({ lineCount: value });
+              }
+            }}
+            className="flex-1 px-4 py-2 text-center bg-gray-50 text-gray-800 rounded-lg border-2 border-gray-200 font-semibold focus:border-blue-500 focus:outline-none"
+          />
+          <button
+            onClick={() => updateToolSettings({ lineCount: Math.min(10, toolSettings.lineCount + 1) })}
+            className="w-10 h-10 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-bold transition-all"
+          >
+            +
+          </button>
+        </div>
       </div>
 
       <div>
         <label className="block text-sm font-semibold text-gray-700 mb-3">
-          선 두께: <span className="text-blue-600">{toolSettings.lineThickness}</span>
+          선 두께
         </label>
-        <input
-          type="range"
-          min="1"
-          max="6"
-          value={toolSettings.lineThickness}
-          onChange={(e) => updateToolSettings({ lineThickness: parseInt(e.target.value) })}
-          className="w-full h-2 bg-gray-200 rounded-full appearance-none cursor-pointer accent-blue-500"
-        />
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => updateToolSettings({ lineThickness: Math.max(1, toolSettings.lineThickness - 1) })}
+            className="w-10 h-10 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-bold transition-all"
+          >
+            -
+          </button>
+          <input
+            type="number"
+            min="1"
+            max="6"
+            value={toolSettings.lineThickness}
+            onChange={(e) => {
+              const value = parseInt(e.target.value);
+              if (!isNaN(value) && value >= 1 && value <= 6) {
+                updateToolSettings({ lineThickness: value });
+              }
+            }}
+            className="flex-1 px-4 py-2 text-center bg-gray-50 text-gray-800 rounded-lg border-2 border-gray-200 font-semibold focus:border-blue-500 focus:outline-none"
+          />
+          <button
+            onClick={() => updateToolSettings({ lineThickness: Math.min(6, toolSettings.lineThickness + 1) })}
+            className="w-10 h-10 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-bold transition-all"
+          >
+            +
+          </button>
+        </div>
       </div>
 
       <div>
@@ -85,16 +123,35 @@ const ReferenceLines: React.FC = () => {
       {toolSettings.showVerticalLines && (
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-3">
-            수직선 개수: <span className="text-blue-600">{toolSettings.verticalLineCount}</span>
+            수직선 개수
           </label>
-          <input
-            type="range"
-            min="1"
-            max="10"
-            value={toolSettings.verticalLineCount}
-            onChange={(e) => updateToolSettings({ verticalLineCount: parseInt(e.target.value) })}
-            className="w-full h-2 bg-gray-200 rounded-full appearance-none cursor-pointer accent-blue-500"
-          />
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => updateToolSettings({ verticalLineCount: Math.max(1, toolSettings.verticalLineCount - 1) })}
+              className="w-10 h-10 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-bold transition-all"
+            >
+              -
+            </button>
+            <input
+              type="number"
+              min="1"
+              max="10"
+              value={toolSettings.verticalLineCount}
+              onChange={(e) => {
+                const value = parseInt(e.target.value);
+                if (!isNaN(value) && value >= 1 && value <= 10) {
+                  updateToolSettings({ verticalLineCount: value });
+                }
+              }}
+              className="flex-1 px-4 py-2 text-center bg-gray-50 text-gray-800 rounded-lg border-2 border-gray-200 font-semibold focus:border-blue-500 focus:outline-none"
+            />
+            <button
+              onClick={() => updateToolSettings({ verticalLineCount: Math.min(10, toolSettings.verticalLineCount + 1) })}
+              className="w-10 h-10 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-bold transition-all"
+            >
+              +
+            </button>
+          </div>
         </div>
       )}
 

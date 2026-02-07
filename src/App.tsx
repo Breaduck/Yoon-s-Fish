@@ -37,10 +37,15 @@ function AppContent() {
                         : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
                     }`}
                   >
-                    {isComparisonMode ? '✓ 비교 모드' : '비교 모드'}
+                    {isComparisonMode ? '비교 모드' : '비교 모드'}
                   </button>
-                  <VideoUpload />
-                  {isComparisonMode && <VideoUpload isSecondVideo={true} />}
+                  {!isComparisonMode && <VideoUpload />}
+                  {isComparisonMode && (
+                    <>
+                      <VideoUpload />
+                      <VideoUpload isSecondVideo={true} />
+                    </>
+                  )}
                   <CameraCapture />
                   <ExportDialog />
                 </div>

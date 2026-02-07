@@ -36,7 +36,7 @@ const ToolPanel: React.FC = () => {
               : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
           }`}
         >
-          📏 기준선
+          기준선
         </button>
 
         <button
@@ -47,7 +47,7 @@ const ToolPanel: React.FC = () => {
               : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
           }`}
         >
-          ➤ 화살표
+          화살표
         </button>
 
         <button
@@ -58,7 +58,7 @@ const ToolPanel: React.FC = () => {
               : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
           }`}
         >
-          ✏️ 자유 그리기
+          자유 그리기
         </button>
 
         <button
@@ -69,7 +69,7 @@ const ToolPanel: React.FC = () => {
               : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
           }`}
         >
-          🗑️ 지우개
+          지우개
         </button>
 
         <button
@@ -80,7 +80,7 @@ const ToolPanel: React.FC = () => {
               : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
           }`}
         >
-          📐 각도기
+          각도기
         </button>
       </div>
 

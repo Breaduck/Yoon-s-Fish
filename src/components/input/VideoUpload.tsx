@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import { useVideo } from '../../context/VideoContext';
+import { useTool } from '../../context/ToolContext';
 
 interface VideoUploadProps {
   isSecondVideo?: boolean;
@@ -7,6 +8,7 @@ interface VideoUploadProps {
 
 const VideoUpload: React.FC<VideoUploadProps> = ({ isSecondVideo = false }) => {
   const { setSource, setSource2 } = useVideo();
+  const { isComparisonMode } = useTool();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,7 +44,10 @@ const VideoUpload: React.FC<VideoUploadProps> = ({ isSecondVideo = false }) => {
             : 'bg-gradient-to-r from-blue-500 to-emerald-500 hover:shadow-lg text-white shadow-blue-500/30'
         }`}
       >
-        {isSecondVideo ? '📹 After 영상' : '📹 Before 영상'}
+        {isComparisonMode
+          ? (isSecondVideo ? 'After 영상 업로드' : 'Before 영상 업로드')
+          : '영상 업로드'
+        }
       </button>
     </div>
   );
