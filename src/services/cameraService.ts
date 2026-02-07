@@ -3,16 +3,24 @@ export class CameraService {
 
   async startCamera(
     videoElement: HTMLVideoElement,
-    constraints: MediaStreamConstraints = {
-      video: {
-        width: { ideal: 1280 },
-        height: { ideal: 720 },
-        facingMode: 'user',
-      },
-      audio: false,
-    }
+    deviceId?: string
   ): Promise<MediaStream> {
     try {
+      const constraints: MediaStreamConstraints = {
+        video: deviceId
+          ? {
+              deviceId: { exact: deviceId },
+              width: { ideal: 1280 },
+              height: { ideal: 720 },
+            }
+          : {
+              width: { ideal: 1280 },
+              height: { ideal: 720 },
+              facingMode: 'user',
+            },
+        audio: false,
+      };
+
       this.stream = await navigator.mediaDevices.getUserMedia(constraints);
       videoElement.srcObject = this.stream;
       await videoElement.play();

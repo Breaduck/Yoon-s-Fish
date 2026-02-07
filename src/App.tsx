@@ -2,6 +2,7 @@ import React, { useRef, useEffect } from 'react';
 import { VideoProvider, useVideo } from './context/VideoContext';
 import { AnnotationProvider, useAnnotations } from './context/AnnotationContext';
 import { ToolProvider, useTool } from './context/ToolContext';
+import { ClipProvider } from './context/ClipContext';
 import VideoPlayer from './components/video/VideoPlayer';
 import VideoPlayer2 from './components/video/VideoPlayer2';
 import VideoCanvas from './components/video/VideoCanvas';
@@ -9,6 +10,7 @@ import VideoCanvas2 from './components/video/VideoCanvas2';
 import VideoControls from './components/video/VideoControls';
 import FullscreenPlayer from './components/video/FullscreenPlayer';
 import ToolPanel from './components/tools/ToolPanel';
+import ClipPanel from './components/clips/ClipPanel';
 import VideoUpload from './components/input/VideoUpload';
 import CameraCapture from './components/input/CameraCapture';
 import ExportDialog from './components/export/ExportDialog';
@@ -145,8 +147,13 @@ function AppContent() {
                 <ToolPanel />
               </aside>
 
-              {/* Video area - aligned with header */}
-              <div className="container mx-auto px-6 py-6">
+              {/* Clip panel - fixed to right */}
+              <aside className="fixed right-4 top-32" style={{ width: '264px', zIndex: 10 }}>
+                <ClipPanel />
+              </aside>
+
+              {/* Video area - aligned with header, with margins for side panels */}
+              <div className="container mx-auto px-6 py-6" style={{ marginLeft: '220px', marginRight: '280px' }}>
                 <main>
                   <div className="space-y-5">
                     {/* Video player container */}
@@ -288,7 +295,9 @@ function App() {
     <VideoProvider>
       <AnnotationProvider>
         <ToolProvider>
-          <AppContent />
+          <ClipProvider>
+            <AppContent />
+          </ClipProvider>
         </ToolProvider>
       </AnnotationProvider>
     </VideoProvider>
