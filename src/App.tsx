@@ -141,20 +141,14 @@ function AppContent() {
             </header>
 
             {/* Main content */}
-            <div className="relative">
-              {/* Tool panel - fixed to left */}
-              <aside className="fixed left-4 top-32" style={{ width: '180px', zIndex: 10 }}>
+            <div className="flex gap-4 px-4 py-6">
+              {/* Tool panel - left */}
+              <aside style={{ width: '180px', flexShrink: 0 }}>
                 <ToolPanel />
               </aside>
 
-              {/* Clip panel - fixed to right */}
-              <aside className="fixed right-4 top-32" style={{ width: '264px', zIndex: 10 }}>
-                <ClipPanel />
-              </aside>
-
-              {/* Video area - aligned with header, with margins for side panels */}
-              <div className="container mx-auto px-6 py-6" style={{ marginLeft: '220px', marginRight: '280px' }}>
-                <main>
+              {/* Video area - center, flexible */}
+              <main className="flex-1" style={{ minWidth: 0 }}>
                   <div className="space-y-5">
                     {/* Video player container */}
                     {isComparisonMode ? (
@@ -281,7 +275,11 @@ function AppContent() {
                     )}
                   </div>
                 </main>
-              </div>
+
+              {/* Clip panel - right */}
+              <aside style={{ width: '264px', flexShrink: 0 }}>
+                <ClipPanel />
+              </aside>
             </div>
 
             {/* Fullscreen Player */}

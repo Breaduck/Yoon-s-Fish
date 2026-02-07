@@ -9,8 +9,11 @@ const VideoPlayer: React.FC = () => {
     if (!video || !videoState.source) return;
 
     if (videoState.source.type === 'file' && videoState.source.url) {
+      video.srcObject = null;
       video.src = videoState.source.url;
+      video.load();
     } else if (videoState.source.type === 'camera' && videoState.source.stream) {
+      video.src = '';
       video.srcObject = videoState.source.stream;
     }
   }, [videoRef, videoState.source]);
