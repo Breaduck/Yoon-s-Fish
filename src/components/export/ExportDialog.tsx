@@ -101,7 +101,7 @@ const ExportDialog: React.FC = () => {
 
       const canvas = document.createElement('canvas');
       const video2 = videoRef2.current;
-      const isComparison = isComparisonMode && video2 && secondVideoSource;
+      const isComparison = isComparisonMode && video2 && secondVideoSource && video2.duration > 0;
 
       if (isComparison) {
         // 비교 모드: 전체 레이아웃 포함 (aspect-video with gap and padding)
@@ -221,8 +221,68 @@ const ExportDialog: React.FC = () => {
 
         const currentTime = Math.floor(video.currentTime * 1000);
 
+        // Draw reference lines within video bounds only
         if (annotations.referenceLines.length > 0) {
-          drawingEngine.drawReferenceLines(annotations.referenceLines);
+          ctx.save();
+          annotations.referenceLines.forEach((line) => {
+            if (isComparison) {
+              // Draw on both videos in comparison mode
+              if (line.type === 'horizontal') {
+                const y = (line.position / 100) * videoHeight + padding;
+                // Left video
+                ctx.strokeStyle = line.color;
+                ctx.lineWidth = line.thickness;
+                ctx.setLineDash([10, 5]);
+                ctx.beginPath();
+                ctx.moveTo(padding, y);
+                ctx.lineTo(padding + videoWidth, y);
+                ctx.stroke();
+                // Right video
+                ctx.beginPath();
+                ctx.moveTo(padding + videoWidth + gap, y);
+                ctx.lineTo(padding + videoWidth + gap + videoWidth, y);
+                ctx.stroke();
+              } else {
+                const x = (line.position / 100) * videoWidth;
+                ctx.strokeStyle = line.color;
+                ctx.lineWidth = line.thickness;
+                ctx.setLineDash([10, 5]);
+                // Left video
+                ctx.beginPath();
+                ctx.moveTo(padding + x, padding);
+                ctx.lineTo(padding + x, padding + videoHeight);
+                ctx.stroke();
+                // Right video
+                ctx.beginPath();
+                ctx.moveTo(padding + videoWidth + gap + x, padding);
+                ctx.lineTo(padding + videoWidth + gap + x, padding + videoHeight);
+                ctx.stroke();
+              }
+            } else {
+              // Single video mode - draw across full canvas
+              if (line.type === 'horizontal') {
+                const y = (line.position / 100) * canvas.height;
+                ctx.strokeStyle = line.color;
+                ctx.lineWidth = line.thickness;
+                ctx.setLineDash([10, 5]);
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+              } else {
+                const x = (line.position / 100) * canvas.width;
+                ctx.strokeStyle = line.color;
+                ctx.lineWidth = line.thickness;
+                ctx.setLineDash([10, 5]);
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+              }
+            }
+          });
+          ctx.setLineDash([]);
+          ctx.restore();
         }
 
         const currentArrows = annotations.arrows.filter(a => a.timestamp <= currentTime);
@@ -290,6 +350,15 @@ const ExportDialog: React.FC = () => {
 
       const startRecording = async () => {
         try {
+          // Wait for both videos to be ready in comparison mode
+          if (isComparison && video2) {
+            if (video2.readyState < 2) {
+              await new Promise<void>((resolve) => {
+                video2.addEventListener('loadeddata', () => resolve(), { once: true });
+              });
+            }
+          }
+
           recorder.start(100);
           const playPromise = video.play();
           if (playPromise !== undefined) {

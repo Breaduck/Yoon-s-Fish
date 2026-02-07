@@ -170,11 +170,12 @@ const CameraCapture: React.FC = () => {
       {/* Camera Selector Modal */}
       {showCameraSelector && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
-          style={{ zIndex: 999999 }}
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-6"
+          style={{ zIndex: 999999, overflow: 'auto' }}
         >
-          <div className="bg-white rounded-3xl p-6 shadow-2xl max-w-md w-full mx-4" style={{ maxHeight: '80vh', overflowY: 'auto' }}>
-            <h3 className="text-xl font-bold text-gray-800 mb-4">카메라 선택</h3>
+          <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full my-auto" style={{ maxHeight: '85vh', display: 'flex', flexDirection: 'column' }}>
+            <div className="p-6 overflow-y-auto" style={{ flex: '1 1 auto', minHeight: 0 }}>
+              <h3 className="text-xl font-bold text-gray-800 mb-4">카메라 선택</h3>
 
             <div className="space-y-4 mb-6">
               {/* IP 카메라 (MediaMTX) */}
@@ -231,13 +232,16 @@ const CameraCapture: React.FC = () => {
                 </div>
               )}
             </div>
+            </div>
 
-            <button
-              onClick={() => setShowCameraSelector(false)}
-              className="w-full px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-semibold transition-all"
-            >
-              취소
-            </button>
+            <div className="p-4 border-t border-gray-200">
+              <button
+                onClick={() => setShowCameraSelector(false)}
+                className="w-full px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-semibold transition-all"
+              >
+                취소
+              </button>
+            </div>
           </div>
         </div>
       )}

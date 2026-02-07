@@ -36,11 +36,12 @@ const LiveCameraSelect: React.FC = () => {
 
       {showModal && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4"
-          style={{ zIndex: 999999 }}
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-6"
+          style={{ zIndex: 999999, overflow: 'auto' }}
         >
-          <div className="bg-white rounded-3xl p-8 shadow-2xl max-w-md w-full">
-            <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">카메라 선택</h3>
+          <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full my-auto" style={{ maxHeight: '85vh', display: 'flex', flexDirection: 'column' }}>
+            <div className="p-8 overflow-y-auto" style={{ flex: '1 1 auto', minHeight: 0 }}>
+              <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">카메라 선택</h3>
 
             <div className="space-y-3">
               <button
@@ -70,13 +71,16 @@ const LiveCameraSelect: React.FC = () => {
                 MediaMTX 서버가 실행 중이어야 합니다
               </p>
             </div>
+            </div>
 
-            <button
-              onClick={() => setShowModal(false)}
-              className="mt-4 w-full px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-semibold transition-all"
-            >
-              취소
-            </button>
+            <div className="p-4 border-t border-gray-200">
+              <button
+                onClick={() => setShowModal(false)}
+                className="w-full px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-semibold transition-all"
+              >
+                취소
+              </button>
+            </div>
           </div>
         </div>
       )}
