@@ -181,6 +181,48 @@ const VideoCanvas2: React.FC = () => {
         ctx.restore();
       }
 
+      // Highlight hovered annotation in eraser mode
+      if (activeTool === 'eraser' && hoveredAnnotation) {
+        ctx.save();
+        ctx.strokeStyle = 'rgba(255, 255, 0, 0.8)';
+        ctx.lineWidth = 6;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+
+        if (hoveredAnnotation.type === 'arrow') {
+          const arrow = annotations.arrows.find(a => a.id === hoveredAnnotation.id);
+          if (arrow) {
+            ctx.beginPath();
+            ctx.moveTo(arrow.start.x, arrow.start.y);
+            ctx.lineTo(arrow.end.x, arrow.end.y);
+            ctx.stroke();
+          }
+        } else if (hoveredAnnotation.type === 'drawing') {
+          const drawing = annotations.freeDrawings.find(d => d.id === hoveredAnnotation.id);
+          if (drawing && drawing.points.length > 1) {
+            ctx.beginPath();
+            ctx.moveTo(drawing.points[0].x, drawing.points[0].y);
+            for (let i = 1; i < drawing.points.length; i++) {
+              ctx.lineTo(drawing.points[i].x, drawing.points[i].y);
+            }
+            ctx.stroke();
+          }
+        } else if (hoveredAnnotation.type === 'angle') {
+          const angle = annotations.angles.find(a => a.id === hoveredAnnotation.id);
+          if (angle) {
+            // Highlight the two lines of the angle
+            ctx.beginPath();
+            ctx.moveTo(angle.points[1].x, angle.points[1].y);
+            ctx.lineTo(angle.points[0].x, angle.points[0].y);
+            ctx.moveTo(angle.points[1].x, angle.points[1].y);
+            ctx.lineTo(angle.points[2].x, angle.points[2].y);
+            ctx.stroke();
+          }
+        }
+
+        ctx.restore();
+      }
+
       animationFrameId = requestAnimationFrame(render);
     };
 
@@ -200,6 +242,7 @@ const VideoCanvas2: React.FC = () => {
     angleMeasurement,
     activeTool,
     toolSettings,
+    hoveredAnnotation,
   ]);
 
   // Determine cursor style based on active tool
@@ -220,6 +263,79 @@ const VideoCanvas2: React.FC = () => {
   const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
     if (activeTool === 'arrow') arrowDrawing.handleMouseMove(e);
     else if (activeTool === 'pen') penDrawing.handleMouseMove(e);
+    else if (activeTool === 'eraser') {
+      // Find hovered annotation for highlight
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      const clickX = (e.clientX - rect.left) * scaleX;
+      const clickY = (e.clientY - rect.top) * scaleY;
+      const currentTimestamp = Math.floor(videoState.currentTime * 1000);
+      const tolerance = 100;
+
+      // Check arrows
+      const hoveredArrow = annotations.arrows.find((arrow) => {
+        if (Math.abs(arrow.timestamp - currentTimestamp) > tolerance) return false;
+        if (arrow.videoIndex !== 1) return false;
+
+        const dx = arrow.end.x - arrow.start.x;
+        const dy = arrow.end.y - arrow.start.y;
+        const length = Math.sqrt(dx * dx + dy * dy);
+        const dotProduct = ((clickX - arrow.start.x) * dx + (clickY - arrow.start.y) * dy) / (length * length);
+
+        if (dotProduct < 0 || dotProduct > 1) return false;
+
+        const projX = arrow.start.x + dotProduct * dx;
+        const projY = arrow.start.y + dotProduct * dy;
+        const distance = Math.sqrt((clickX - projX) ** 2 + (clickY - projY) ** 2);
+
+        return distance < 15;
+      });
+
+      if (hoveredArrow) {
+        setHoveredAnnotation({ type: 'arrow', id: hoveredArrow.id });
+        return;
+      }
+
+      // Check free drawings
+      const hoveredDrawing = annotations.freeDrawings.find((drawing) => {
+        if (Math.abs(drawing.timestamp - currentTimestamp) > tolerance) return false;
+        if (drawing.videoIndex !== 1) return false;
+
+        return drawing.points.some((point) => {
+          const distance = Math.sqrt((clickX - point.x) ** 2 + (clickY - point.y) ** 2);
+          return distance < 20;
+        });
+      });
+
+      if (hoveredDrawing) {
+        setHoveredAnnotation({ type: 'drawing', id: hoveredDrawing.id });
+        return;
+      }
+
+      // Check angles
+      const hoveredAngle = annotations.angles.find((angle) => {
+        if (Math.abs(angle.timestamp - currentTimestamp) > tolerance) return false;
+        if (angle.videoIndex !== 1) return false;
+
+        return angle.points.some((point) => {
+          const distance = Math.sqrt((clickX - point.x) ** 2 + (clickY - point.y) ** 2);
+          return distance < 20;
+        });
+      });
+
+      if (hoveredAngle) {
+        setHoveredAnnotation({ type: 'angle', id: hoveredAngle.id });
+        return;
+      }
+
+      setHoveredAnnotation(null);
+    } else {
+      setHoveredAnnotation(null);
+    }
   };
 
   const handleMouseUp = (e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -231,7 +347,7 @@ const VideoCanvas2: React.FC = () => {
     <canvas
       ref={canvasRef}
       className="absolute top-0 left-0 w-full h-full"
-      style={{ cursor: getCursorStyle(), zIndex: 10 }}
+      style={{ cursor: getCursorStyle() }}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}

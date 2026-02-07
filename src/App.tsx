@@ -22,6 +22,9 @@ function AppContent() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const fileInput2Ref = useRef<HTMLInputElement>(null);
 
+  // Controls visibility state
+  const [showControls, setShowControls] = React.useState(true);
+
   const handleFileUpload = (file: File, isSecondVideo: boolean) => {
     const url = URL.createObjectURL(file);
     if (isSecondVideo) {
@@ -235,7 +238,11 @@ function AppContent() {
                       </div>
                     ) : (
                       <div className="bg-white rounded-3xl overflow-hidden shadow-xl">
-                        <div className="bg-black aspect-video relative">
+                        <div
+                          className="bg-black aspect-video relative"
+                          onMouseEnter={() => setShowControls(true)}
+                          onMouseLeave={() => setShowControls(false)}
+                        >
                           <VideoPlayer />
                           <VideoCanvas />
                           {/* Empty state upload icon */}
@@ -252,8 +259,12 @@ function AppContent() {
                               </div>
                             </div>
                           )}
-                          {/* Video controls overlay - inside video for single mode */}
-                          <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
+                          {/* Video controls overlay - inside video for single mode with auto-hide */}
+                          <div
+                            className={`absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/60 to-transparent transition-opacity duration-300 ${
+                              showControls ? 'opacity-100' : 'opacity-0'
+                            }`}
+                          >
                             <VideoControls />
                           </div>
                         </div>
