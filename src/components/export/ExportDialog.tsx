@@ -1,128 +1,79 @@
-import React, { useState } from 'react';
-import { ExportOptions } from '../../types/export';
-import { useExport } from '../../hooks/useExport';
-import ExportProgress from './ExportProgress';
+import React from 'react';
+import { useVideo } from '../../context/VideoContext';
+import { useAnnotations } from '../../context/AnnotationContext';
 
 const ExportDialog: React.FC = () => {
-  const { progress, exportVideo } = useExport();
-  const [isOpen, setIsOpen] = useState(false);
-  const [options, setOptions] = useState<ExportOptions>({
-    format: 'webm',
-    quality: 'high',
-    includeAnnotations: true,
-    includePose: true,
-  });
+  const { videoRef, videoState } = useVideo();
+  const { annotations } = useAnnotations();
 
-  const handleExport = () => {
-    exportVideo(options);
+  const handleDownload = async () => {
+    const video = videoRef.current;
+    if (!video || !videoState.source) {
+      alert('영상을 먼저 업로드해주세요.');
+      return;
+    }
+
+    try {
+      // Create canvas for rendering
+      const canvas = document.createElement('canvas');
+      canvas.width = 1920;
+      canvas.height = 1080;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      // Create video stream
+      const stream = canvas.captureStream(30);
+      const mediaRecorder = new MediaRecorder(stream, {
+        mimeType: 'video/webm;codecs=vp9',
+        videoBitsPerSecond: 10000000
+      });
+
+      const chunks: Blob[] = [];
+      mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(chunks, { type: 'video/webm' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `aquaflux-video-${Date.now()}.webm`;
+        a.click();
+        URL.revokeObjectURL(url);
+      };
+
+      mediaRecorder.start();
+
+      // Record video with annotations
+      video.currentTime = 0;
+      const duration = video.duration;
+      const fps = 30;
+      const frameTime = 1000 / fps;
+
+      for (let t = 0; t < duration; t += 1 / fps) {
+        video.currentTime = t;
+        await new Promise(resolve => setTimeout(resolve, frameTime));
+
+        // Draw video frame
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        // Draw annotations for current time
+        const currentTime = Math.floor(t * 1000);
+        // Add annotation drawing logic here if needed
+      }
+
+      mediaRecorder.stop();
+    } catch (error) {
+      console.error('Download error:', error);
+      alert('다운로드 중 오류가 발생했습니다.');
+    }
   };
 
   return (
-    <>
-      <button
-        onClick={() => setIsOpen(true)}
-        className="px-5 py-2.5 bg-gradient-to-r from-purple-500 to-pink-500 hover:shadow-lg text-white rounded-xl font-semibold transition-all shadow-md shadow-purple-500/30"
-      >
-        영상 내보내기
-      </button>
-      {isOpen && (
-        <div
-          className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center overflow-y-auto p-4"
-          style={{ zIndex: 999999, position: 'fixed' }}
-          onClick={() => setIsOpen(false)}
-        >
-          <div className="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl my-auto relative" onClick={(e) => e.stopPropagation()}>
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">영상 내보내기</h2>
-
-        {progress.status === 'idle' ? (
-          <div className="space-y-5">
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-3">형식</label>
-              <select
-                value={options.format}
-                onChange={(e) => setOptions({ ...options, format: e.target.value as 'webm' | 'mp4' })}
-                className="w-full px-4 py-3 bg-gray-50 text-gray-800 rounded-xl border-2 border-gray-200 font-medium focus:border-blue-500 focus:outline-none"
-              >
-                <option value="webm">WebM</option>
-                <option value="mp4">MP4</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-3">품질</label>
-              <select
-                value={options.quality}
-                onChange={(e) => setOptions({ ...options, quality: e.target.value as 'low' | 'medium' | 'high' })}
-                className="w-full px-4 py-3 bg-gray-50 text-gray-800 rounded-xl border-2 border-gray-200 font-medium focus:border-blue-500 focus:outline-none"
-              >
-                <option value="low">낮음 (2.5 Mbps)</option>
-                <option value="medium">보통 (5 Mbps)</option>
-                <option value="high">높음 (10 Mbps)</option>
-              </select>
-            </div>
-
-            <div className="space-y-3">
-              <label className="flex items-center gap-3 text-sm font-semibold text-gray-700 cursor-pointer bg-gray-50 p-4 rounded-xl hover:bg-gray-100 transition-all">
-                <input
-                  type="checkbox"
-                  checked={options.includeAnnotations}
-                  onChange={(e) => setOptions({ ...options, includeAnnotations: e.target.checked })}
-                  className="w-5 h-5 accent-blue-500 rounded"
-                />
-                주석 포함 (화살표, 선)
-              </label>
-
-              <label className="flex items-center gap-3 text-sm font-semibold text-gray-700 cursor-pointer bg-gray-50 p-4 rounded-xl hover:bg-gray-100 transition-all">
-                <input
-                  type="checkbox"
-                  checked={options.includePose}
-                  onChange={(e) => setOptions({ ...options, includePose: e.target.checked })}
-                  className="w-5 h-5 accent-blue-500 rounded"
-                />
-                자세 감지 포함
-              </label>
-            </div>
-
-            <div className="flex gap-3 mt-8">
-              <button
-                onClick={handleExport}
-                className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-500 to-emerald-500 hover:shadow-lg text-white rounded-xl font-bold transition-all shadow-md shadow-blue-500/30"
-              >
-                내보내기
-              </button>
-              <button
-                onClick={() => setIsOpen(false)}
-                className="flex-1 px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-semibold transition-all"
-              >
-                취소
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div>
-            <ExportProgress progress={progress} />
-            {progress.status === 'complete' && (
-              <button
-                onClick={() => setIsOpen(false)}
-                className="w-full mt-6 px-6 py-3 bg-gradient-to-r from-blue-500 to-emerald-500 hover:shadow-lg text-white rounded-xl font-bold transition-all shadow-md shadow-blue-500/30"
-              >
-                닫기
-              </button>
-            )}
-            {progress.status === 'error' && (
-              <button
-                onClick={() => setIsOpen(false)}
-                className="w-full mt-6 px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-semibold transition-all"
-              >
-                닫기
-              </button>
-            )}
-          </div>
-        )}
-          </div>
-        </div>
-      )}
-    </>
+    <button
+      onClick={handleDownload}
+      className="px-5 py-2.5 bg-gradient-to-r from-purple-500 to-pink-500 hover:shadow-lg text-white rounded-xl font-semibold transition-all shadow-md shadow-purple-500/30"
+    >
+      영상 다운로드
+    </button>
   );
 };
 
