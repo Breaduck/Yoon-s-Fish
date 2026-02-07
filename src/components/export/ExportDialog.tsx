@@ -84,14 +84,24 @@ const ExportDialog: React.FC = () => {
       };
 
       setProgress({ status: 'encoding', progress: 10, message: '녹화 중...' });
-      mediaRecorder.start();
+
+      // 비디오 준비
+      video.pause();
       video.currentTime = 0;
-      video.playbackRate = 4.0; // 4배속으로 빠르게 녹화 (75% 시간 단축)
+      video.playbackRate = 3.0;
+      video.muted = true;
 
       const renderFrame = () => {
-        if (video.ended || video.paused) {
+        if (video.ended) {
+          video.playbackRate = 1.0;
+          video.muted = false;
+          if (mediaRecorder.state !== 'inactive') {
+            mediaRecorder.stop();
+          }
           return;
         }
+
+        if (video.paused) return;
 
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
@@ -117,21 +127,21 @@ const ExportDialog: React.FC = () => {
         requestAnimationFrame(renderFrame);
       };
 
-      video.onended = () => {
-        video.playbackRate = 1.0; // 원래 속도로 복원
-        if (mediaRecorder.state !== 'inactive') {
-          mediaRecorder.stop();
+      const startRecording = async () => {
+        try {
+          mediaRecorder.start(100); // 100ms마다 데이터 수집
+          await video.play();
+          requestAnimationFrame(renderFrame);
+        } catch (err) {
+          console.error('Play failed:', err);
+          setProgress({ status: 'error', progress: 0, message: '재생 실패', error: String(err) });
         }
       };
 
       if (video.readyState >= 2) {
-        video.play();
-        requestAnimationFrame(renderFrame);
+        startRecording();
       } else {
-        video.addEventListener('loadeddata', () => {
-          video.play();
-          requestAnimationFrame(renderFrame);
-        }, { once: true });
+        video.addEventListener('loadeddata', startRecording, { once: true });
       }
     } catch (error) {
       console.error('Download error:', error);
