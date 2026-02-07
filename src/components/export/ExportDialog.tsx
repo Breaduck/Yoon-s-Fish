@@ -161,18 +161,18 @@ const ExportDialog: React.FC = () => {
 
         if (video.paused) return;
 
+        // 패딩과 간격 계산 (비교 모드용)
+        const padding = 30;
+        const gap = 30;
+        const videoWidth = (canvas.width - padding * 2 - gap) / 2;
+        const videoHeight = canvas.height - padding * 2;
+        const cornerRadius = 20;
+
         // 비교 모드: 현재 UI 레이아웃 그대로
         if (isComparison && video2) {
           // 흰색 배경
           ctx.fillStyle = '#ffffff';
           ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-          // 패딩과 간격 계산 (p-3 = 12px, gap-3 = 12px)
-          const padding = 30;
-          const gap = 30;
-          const videoWidth = (canvas.width - padding * 2 - gap) / 2;
-          const videoHeight = canvas.height - padding * 2;
-          const cornerRadius = 20;
 
           // 검은색 배경 (Before - 좌측)
           ctx.fillStyle = '#000000';
@@ -326,7 +326,7 @@ const ExportDialog: React.FC = () => {
           await ffmpeg.exec(['-i', 'input.webm', '-c:v', 'libx264', '-preset', 'ultrafast', 'output.mp4']);
 
           const data = await ffmpeg.readFile('output.mp4');
-          const mp4Blob = new Blob([data], { type: 'video/mp4' });
+          const mp4Blob = new Blob([new Uint8Array(data as Uint8Array)], { type: 'video/mp4' });
 
           const url = URL.createObjectURL(mp4Blob);
           const a = document.createElement('a');
