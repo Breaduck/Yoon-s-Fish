@@ -169,8 +169,11 @@ const CameraCapture: React.FC = () => {
 
       {/* Camera Selector Modal */}
       {showCameraSelector && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-3xl p-6 shadow-2xl max-w-md w-full mx-4">
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+          style={{ zIndex: 999999 }}
+        >
+          <div className="bg-white rounded-3xl p-6 shadow-2xl max-w-md w-full mx-4" style={{ maxHeight: '80vh', overflowY: 'auto' }}>
             <h3 className="text-xl font-bold text-gray-800 mb-4">카메라 선택</h3>
 
             {devices.length === 0 ? (
