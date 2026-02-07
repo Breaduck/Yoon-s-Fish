@@ -14,10 +14,45 @@ import ExportDialog from './components/export/ExportDialog';
 
 function AppContent() {
   const { isComparisonMode, setIsComparisonMode } = useTool();
-  const { videoState, secondVideoSource } = useVideo();
+  const { videoState, secondVideoSource, setSource, setSource2 } = useVideo();
+
+  // Hidden file inputs for click-to-upload
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const fileInput2Ref = React.useRef<HTMLInputElement>(null);
+
+  const handleFileUpload = (file: File, isSecondVideo: boolean) => {
+    const url = URL.createObjectURL(file);
+    if (isSecondVideo) {
+      setSource2({ type: 'file', url });
+    } else {
+      setSource({ type: 'file', url });
+    }
+  };
 
   return (
           <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50">
+            {/* Hidden file inputs for click-to-upload */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="video/*"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleFileUpload(file, false);
+              }}
+              className="hidden"
+            />
+            <input
+              ref={fileInput2Ref}
+              type="file"
+              accept="video/*"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleFileUpload(file, true);
+              }}
+              className="hidden"
+            />
+
             {/* Header */}
             <header className="bg-white/80 backdrop-blur-lg border-b border-gray-200 shadow-sm">
               <div className="container mx-auto px-6 py-5 flex items-center justify-between">
@@ -76,7 +111,10 @@ function AppContent() {
                           <VideoCanvas />
                           {/* Empty state upload icon for Before video */}
                           {!videoState.source && (
-                            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                            <div
+                              className="absolute inset-0 flex items-center justify-center cursor-pointer hover:bg-gray-900/10 transition-all"
+                              onClick={() => fileInputRef.current?.click()}
+                            >
                               <div className="text-center">
                                 <svg className="w-16 h-16 mx-auto text-gray-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
@@ -96,7 +134,10 @@ function AppContent() {
                           <VideoCanvas2 />
                           {/* Empty state upload icon for After video */}
                           {!secondVideoSource && (
-                            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                            <div
+                              className="absolute inset-0 flex items-center justify-center cursor-pointer hover:bg-gray-900/10 transition-all"
+                              onClick={() => fileInput2Ref.current?.click()}
+                            >
                               <div className="text-center">
                                 <svg className="w-16 h-16 mx-auto text-gray-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
@@ -114,7 +155,10 @@ function AppContent() {
                           <VideoCanvas />
                           {/* Empty state upload icon */}
                           {!videoState.source && (
-                            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                            <div
+                              className="absolute inset-0 flex items-center justify-center cursor-pointer hover:bg-gray-900/10 transition-all"
+                              onClick={() => fileInputRef.current?.click()}
+                            >
                               <div className="text-center">
                                 <svg className="w-24 h-24 mx-auto text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />

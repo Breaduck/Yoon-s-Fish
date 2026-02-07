@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useVideo } from '../../context/VideoContext';
 import { useTool } from '../../context/ToolContext';
 import { PlaybackRate } from '../../types/video';
@@ -8,6 +8,29 @@ const PLAYBACK_RATES: PlaybackRate[] = [0.25, 0.5, 0.75, 1, 1.5, 2];
 const VideoControls: React.FC = () => {
   const { videoState, play, pause, setPlaybackRate, seek } = useVideo();
   const { setIsFullscreen } = useTool();
+  const [showSpeedMenu, setShowSpeedMenu] = useState(false);
+  const [customSpeed, setCustomSpeed] = useState('');
+  const speedMenuRef = useRef<HTMLDivElement>(null);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (speedMenuRef.current && !speedMenuRef.current.contains(event.target as Node)) {
+        setShowSpeedMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleCustomSpeedSubmit = () => {
+    const speed = parseFloat(customSpeed);
+    if (!isNaN(speed) && speed > 0 && speed <= 4) {
+      setPlaybackRate(speed as PlaybackRate);
+      setCustomSpeed('');
+      setShowSpeedMenu(false);
+    }
+  };
 
   const handlePlayPause = () => {
     if (videoState.isPlaying) {
@@ -58,13 +81,6 @@ const VideoControls: React.FC = () => {
           >
             ⏭
           </button>
-          <button
-            onClick={() => setIsFullscreen(true)}
-            className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-xl text-gray-700 text-sm font-semibold ml-2 transition-all"
-            title="전체화면"
-          >
-            전체화면
-          </button>
         </div>
 
         {/* Time display */}
@@ -73,22 +89,71 @@ const VideoControls: React.FC = () => {
         </div>
 
         {/* Playback speed */}
-        <div className="flex items-center gap-2 ml-auto">
-          <span className="text-gray-500 text-sm font-medium">속도</span>
-          {PLAYBACK_RATES.map((rate) => (
-            <button
-              key={rate}
-              onClick={() => setPlaybackRate(rate)}
-              className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${
-                videoState.playbackRate === rate
-                  ? 'bg-gradient-to-r from-blue-500 to-emerald-500 text-white shadow-md shadow-blue-500/30'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              {rate}x
-            </button>
-          ))}
+        <div className="relative ml-auto" ref={speedMenuRef}>
+          <button
+            onClick={() => setShowSpeedMenu(!showSpeedMenu)}
+            className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-xl text-gray-700 text-sm font-semibold transition-all flex items-center gap-2"
+          >
+            <span>{videoState.playbackRate}x</span>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+
+          {showSpeedMenu && (
+            <div className="absolute bottom-full right-0 mb-2 bg-white rounded-xl shadow-xl border border-gray-200 p-2 min-w-[200px] z-50">
+              <div className="space-y-1">
+                {PLAYBACK_RATES.map((rate) => (
+                  <button
+                    key={rate}
+                    onClick={() => {
+                      setPlaybackRate(rate);
+                      setShowSpeedMenu(false);
+                    }}
+                    className={`w-full px-4 py-2 rounded-lg text-sm font-semibold text-left transition-all ${
+                      videoState.playbackRate === rate
+                        ? 'bg-gradient-to-r from-blue-500 to-emerald-500 text-white'
+                        : 'text-gray-700 hover:bg-gray-100'
+                    }`}
+                  >
+                    {rate}x
+                  </button>
+                ))}
+              </div>
+              <div className="border-t border-gray-200 mt-2 pt-2">
+                <p className="text-xs text-gray-500 mb-2 px-2">직접 입력 (0.1 ~ 4.0)</p>
+                <div className="flex gap-2">
+                  <input
+                    type="number"
+                    min="0.1"
+                    max="4"
+                    step="0.1"
+                    value={customSpeed}
+                    onChange={(e) => setCustomSpeed(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleCustomSpeedSubmit()}
+                    placeholder="1.0"
+                    className="flex-1 px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none"
+                  />
+                  <button
+                    onClick={handleCustomSpeedSubmit}
+                    className="px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold rounded-lg transition-all"
+                  >
+                    설정
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
+
+        {/* Fullscreen button */}
+        <button
+          onClick={() => setIsFullscreen(true)}
+          className="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-xl text-gray-700 flex items-center justify-center transition-all text-lg"
+          title="전체화면"
+        >
+          ⛶
+        </button>
       </div>
 
       {/* Progress bar */}

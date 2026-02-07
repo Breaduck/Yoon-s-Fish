@@ -6,11 +6,20 @@ import ReferenceLines from './ReferenceLines';
 
 const ToolPanel: React.FC = () => {
   const { activeTool, setActiveTool, toolSettings, updateToolSettings, resetSettings } = useTool();
-  const { clearDrawings } = useAnnotations();
+  const { clearDrawings, setReferenceLines } = useAnnotations();
 
   const handleReset = () => {
     resetSettings();
     clearDrawings();
+  };
+
+  const handleReferenceLinesToggle = () => {
+    if (activeTool === 'reference-lines') {
+      setActiveTool(null);
+      setReferenceLines([]);
+    } else {
+      setActiveTool('reference-lines');
+    }
   };
 
   return (
@@ -29,7 +38,7 @@ const ToolPanel: React.FC = () => {
       {/* Tool buttons */}
       <div className="space-y-2">
         <button
-          onClick={() => setActiveTool(activeTool === 'reference-lines' ? null : 'reference-lines')}
+          onClick={handleReferenceLinesToggle}
           className={`w-full px-5 py-3.5 rounded-xl text-left font-semibold transition-all ${
             activeTool === 'reference-lines'
               ? 'bg-gradient-to-r from-blue-500 to-emerald-500 text-white shadow-lg shadow-blue-500/30'

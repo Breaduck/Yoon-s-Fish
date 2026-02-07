@@ -29,8 +29,8 @@ const ExportDialog: React.FC = () => {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-      <div className="bg-white rounded-3xl p-8 w-96 shadow-2xl">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center" style={{ zIndex: 9999 }}>
+      <div className="bg-white rounded-3xl p-8 w-96 shadow-2xl" onClick={(e) => e.stopPropagation()}>
         <h2 className="text-2xl font-bold text-gray-800 mb-6">영상 내보내기</h2>
 
         {progress.status === 'idle' ? (
