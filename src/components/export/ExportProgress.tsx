@@ -18,20 +18,17 @@ const ExportProgress: React.FC<ExportProgressProps> = ({ progress }) => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <div className="text-center">
-        <div className={`text-4xl font-bold mb-2 ${getStatusColor()}`}>
+        <div className={`text-5xl font-bold ${getStatusColor()}`}>
           {Math.round(progress.progress)}%
         </div>
-        <p className={`text-sm font-semibold ${getStatusColor()}`}>
-          {progress.message}
-        </p>
         {progress.error && (
           <p className="text-sm text-red-400 mt-2">{progress.error}</p>
         )}
       </div>
 
-      <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+      <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
         <div
           className={`h-full transition-all duration-300 ${
             progress.status === 'error'

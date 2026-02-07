@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import ReactDOM from 'react-dom';
 import { useVideo } from '../../context/VideoContext';
 import { useAnnotations } from '../../context/AnnotationContext';
 import { DrawingEngine } from '../../services/drawingEngine';
@@ -129,14 +130,22 @@ const ExportDialog: React.FC = () => {
 
       const startRecording = async () => {
         try {
-          mediaRecorder.start(100); // 100ms마다 데이터 수집
-          await video.play();
+          mediaRecorder.start(100);
+          const playPromise = video.play();
+          if (playPromise !== undefined) {
+            await playPromise;
+          }
           requestAnimationFrame(renderFrame);
         } catch (err) {
           console.error('Play failed:', err);
+          video.playbackRate = 1.0;
+          video.muted = false;
           setProgress({ status: 'error', progress: 0, message: '재생 실패', error: String(err) });
+          setTimeout(() => setProgress(null), 5000);
         }
       };
+
+      video.load();
 
       if (video.readyState >= 2) {
         startRecording();
@@ -160,20 +169,19 @@ const ExportDialog: React.FC = () => {
         영상 다운로드
       </button>
 
-      {progress && (
+      {progress && ReactDOM.createPortal(
         <div
           style={{
             position: 'fixed',
             bottom: '20px',
             right: '20px',
-            zIndex: 99999,
-            top: 'auto',
-            left: 'auto'
+            zIndex: 999999
           }}
           className="bg-white rounded-2xl shadow-2xl p-6 w-80"
         >
           <ExportProgress progress={progress} />
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );
