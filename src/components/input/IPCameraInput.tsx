@@ -6,19 +6,24 @@ const IPCameraInput: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const [camera1IP, setCamera1IP] = useState('');
   const [camera2IP, setCamera2IP] = useState('');
-  const [camera1Port, setCamera1Port] = useState('8080');
-  const [camera2Port, setCamera2Port] = useState('8080');
-  const [camera1Path, setCamera1Path] = useState('/video');
-  const [camera2Path, setCamera2Path] = useState('/video');
+  const [camera1Port, setCamera1Port] = useState('80');
+  const [camera2Port, setCamera2Port] = useState('80');
+  const [camera1Path, setCamera1Path] = useState('/axis-cgi/mjpg/video.cgi');
+  const [camera2Path, setCamera2Path] = useState('/axis-cgi/mjpg/video.cgi');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
 
   const handleConnect = () => {
+    // Create authenticated URL
+    const auth = username && password ? `${username}:${password}@` : '';
+
     if (camera1IP) {
-      const url1 = `http://${camera1IP}:${camera1Port}${camera1Path}`;
+      const url1 = `http://${auth}${camera1IP}:${camera1Port}${camera1Path}`;
       setSource({ type: 'stream', url: url1 });
     }
 
     if (camera2IP) {
-      const url2 = `http://${camera2IP}:${camera2Port}${camera2Path}`;
+      const url2 = `http://${auth}${camera2IP}:${camera2Port}${camera2Path}`;
       setSource2({ type: 'stream', url: url2 });
     }
 
@@ -41,6 +46,32 @@ const IPCameraInput: React.FC = () => {
         >
           <div className="bg-white rounded-3xl p-6 shadow-2xl max-w-2xl w-full mx-4" style={{ maxHeight: '80vh', overflowY: 'auto' }}>
             <h3 className="text-xl font-bold text-gray-800 mb-6">IP 카메라 연결</h3>
+
+            {/* Authentication */}
+            <div className="mb-6 p-4 bg-gray-50 rounded-xl">
+              <h4 className="font-bold text-gray-800 mb-3">인증 정보 (선택)</h4>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">사용자명</label>
+                  <input
+                    type="text"
+                    placeholder="root"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-xl focus:border-gray-500 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">비밀번호</label>
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-xl focus:border-gray-500 focus:outline-none"
+                  />
+                </div>
+              </div>
+            </div>
 
             {/* Camera 1 */}
             <div className="mb-6 p-4 bg-blue-50 rounded-xl">
@@ -123,10 +154,15 @@ const IPCameraInput: React.FC = () => {
             </div>
 
             <div className="bg-yellow-50 p-4 rounded-xl mb-6">
-              <p className="text-sm text-gray-700">
-                <strong>참고:</strong> IP 카메라가 HTTP 스트리밍을 지원해야 합니다.
-                대부분의 IP 카메라는 /video, /stream, /mjpeg 등의 경로를 사용합니다.
+              <p className="text-sm text-gray-700 mb-2">
+                <strong>Axis 카메라 기본 설정:</strong>
               </p>
+              <ul className="text-sm text-gray-600 space-y-1">
+                <li>• IP: 192.168.0.200 (카메라 IP 주소)</li>
+                <li>• 포트: 80 (기본값)</li>
+                <li>• 경로: /axis-cgi/mjpg/video.cgi</li>
+                <li>• 인증: 카메라 관리자 계정</li>
+              </ul>
             </div>
 
             <div className="flex gap-3">
