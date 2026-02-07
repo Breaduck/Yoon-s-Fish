@@ -110,7 +110,7 @@ function AppContent() {
             />
 
             {/* Header */}
-            <header className="bg-white/80 backdrop-blur-lg border-b border-gray-200 shadow-sm">
+            <header className="bg-white/80 backdrop-blur-lg border-b border-gray-200 shadow-sm relative" style={{ zIndex: 100000 }}>
               <div className="container mx-auto px-6 py-5 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-emerald-500 rounded-2xl flex items-center justify-center">
@@ -148,12 +148,12 @@ function AppContent() {
             <div className="container mx-auto px-4 py-6">
               <div className="flex gap-3">
                 {/* Tool panel */}
-                <aside className="flex-shrink-0" style={{ width: '240px' }}>
+                <aside className="flex-shrink-0" style={{ width: '200px' }}>
                   <ToolPanel />
                 </aside>
 
                 {/* Video area */}
-                <main className="flex-1" style={{ maxWidth: 'calc(100% - 252px)' }}>
+                <main className="flex-1">
                   <div className="space-y-5">
                     {/* Video player container */}
                     {isComparisonMode ? (
@@ -261,7 +261,7 @@ function AppContent() {
                           )}
                           {/* Video controls overlay - inside video for single mode with auto-hide */}
                           <div
-                            className={`absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/60 to-transparent transition-opacity duration-300 ${
+                            className={`absolute bottom-0 left-0 right-0 px-6 py-3 transition-opacity duration-300 ${
                               showControls ? 'opacity-100' : 'opacity-0'
                             }`}
                           >
@@ -290,12 +290,6 @@ function AppContent() {
                 </main>
               </div>
             </div>
-
-            {/* Footer */}
-            <footer className="mt-16 py-8 text-center">
-              <p className="text-gray-600 font-medium">AquaFlux - 수영 영상 분석 도구</p>
-              <p className="mt-2 text-gray-400 text-sm">비교 분석 및 실시간 각도 측정</p>
-            </footer>
 
             {/* Fullscreen Player */}
             <FullscreenPlayer />

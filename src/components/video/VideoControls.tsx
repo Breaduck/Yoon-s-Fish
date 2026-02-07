@@ -57,115 +57,100 @@ const VideoControls: React.FC = () => {
   if (!videoState.source) return null;
 
   return (
-    <div className="bg-white p-6 rounded-3xl shadow-lg">
-      <div className="flex items-center gap-4">
-        {/* Playback controls */}
-        <div className="flex items-center gap-2">
-          <button
-            onClick={handleSeekBack}
-            className="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-xl text-gray-700 flex items-center justify-center transition-all"
-            title="5초 뒤로"
-          >
-            ⏮
-          </button>
-          <button
-            onClick={handlePlayPause}
-            className="w-14 h-14 bg-gradient-to-r from-blue-500 to-emerald-500 hover:shadow-lg rounded-2xl text-white font-semibold text-xl flex items-center justify-center transition-all shadow-md shadow-blue-500/30"
-          >
-            {videoState.isPlaying ? '⏸' : '▶'}
-          </button>
-          <button
-            onClick={handleSeekForward}
-            className="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-xl text-gray-700 flex items-center justify-center transition-all"
-            title="5초 앞으로"
-          >
-            ⏭
-          </button>
+    <div className="space-y-2">
+      {/* Progress bar - prominent at top */}
+      <div className="flex items-center gap-3">
+        <div className="text-white text-xs font-medium drop-shadow-lg">
+          {formatTime(videoState.currentTime)}
         </div>
-
-        {/* Time display */}
-        <div className="text-gray-700 text-sm font-semibold">
-          {formatTime(videoState.currentTime)} / {formatTime(videoState.duration)}
-        </div>
-
-        {/* Playback speed */}
-        <div className="relative ml-auto" ref={speedMenuRef}>
-          <button
-            onClick={() => setShowSpeedMenu(!showSpeedMenu)}
-            className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-xl text-gray-700 text-sm font-semibold transition-all flex items-center gap-2"
-          >
-            <span>{videoState.playbackRate}x</span>
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-
-          {showSpeedMenu && (
-            <div className="absolute bottom-full right-0 mb-2 bg-white rounded-xl shadow-xl border border-gray-200 p-2 min-w-[200px] z-50">
-              <div className="space-y-1">
-                {PLAYBACK_RATES.map((rate) => (
-                  <button
-                    key={rate}
-                    onClick={() => {
-                      setPlaybackRate(rate);
-                      setShowSpeedMenu(false);
-                    }}
-                    className={`w-full px-4 py-2 rounded-lg text-sm font-semibold text-left transition-all ${
-                      videoState.playbackRate === rate
-                        ? 'bg-gradient-to-r from-blue-500 to-emerald-500 text-white'
-                        : 'text-gray-700 hover:bg-gray-100'
-                    }`}
-                  >
-                    {rate}x
-                  </button>
-                ))}
-              </div>
-              <div className="border-t border-gray-200 mt-2 pt-2">
-                <p className="text-xs text-gray-500 mb-2 px-2">직접 입력 (0.1 ~ 4.0)</p>
-                <div className="flex gap-2">
-                  <input
-                    type="number"
-                    min="0.1"
-                    max="4"
-                    step="0.1"
-                    value={customSpeed}
-                    onChange={(e) => setCustomSpeed(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleCustomSpeedSubmit()}
-                    placeholder="1.0"
-                    className="flex-1 px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none"
-                  />
-                  <button
-                    onClick={handleCustomSpeedSubmit}
-                    className="px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold rounded-lg transition-all"
-                  >
-                    설정
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Fullscreen button */}
-        <button
-          onClick={() => setIsFullscreen(true)}
-          className="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-xl text-gray-700 flex items-center justify-center transition-all text-lg"
-          title="전체화면"
-        >
-          ⛶
-        </button>
-      </div>
-
-      {/* Progress bar */}
-      <div className="mt-5">
         <input
           type="range"
           min="0"
           max={videoState.duration || 100}
           value={videoState.currentTime}
           onChange={(e) => seek(parseFloat(e.target.value))}
-          className="w-full h-2 bg-gray-200 rounded-full appearance-none cursor-pointer accent-blue-500"
+          className="flex-1 h-1 bg-white/30 rounded-full appearance-none cursor-pointer accent-blue-500"
+          style={{
+            backgroundImage: `linear-gradient(to right, rgb(59, 130, 246) 0%, rgb(59, 130, 246) ${(videoState.currentTime / videoState.duration) * 100}%, rgba(255,255,255,0.3) ${(videoState.currentTime / videoState.duration) * 100}%, rgba(255,255,255,0.3) 100%)`
+          }}
         />
+        <div className="text-white text-xs font-medium drop-shadow-lg">
+          {formatTime(videoState.duration)}
+        </div>
+      </div>
+
+      {/* Centered play button and side controls */}
+      <div className="flex items-center justify-center gap-2 relative">
+        {/* Left controls */}
+        <div className="absolute left-0 flex items-center gap-2">
+          <button
+            onClick={handleSeekBack}
+            className="w-7 h-7 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg text-white flex items-center justify-center transition-all text-sm"
+            title="5초 뒤로"
+          >
+            ⏮
+          </button>
+        </div>
+
+        {/* Center play button */}
+        <button
+          onClick={handlePlayPause}
+          className="w-10 h-10 bg-white/90 hover:bg-white backdrop-blur-sm rounded-full text-gray-800 font-semibold flex items-center justify-center transition-all shadow-lg"
+        >
+          {videoState.isPlaying ? '⏸' : '▶'}
+        </button>
+
+        {/* Right controls */}
+        <div className="absolute right-0 flex items-center gap-2">
+          <button
+            onClick={handleSeekForward}
+            className="w-7 h-7 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg text-white flex items-center justify-center transition-all text-sm"
+            title="5초 앞으로"
+          >
+            ⏭
+          </button>
+
+          {/* Playback speed */}
+          <div className="relative" ref={speedMenuRef}>
+            <button
+              onClick={() => setShowSpeedMenu(!showSpeedMenu)}
+              className="px-2 py-1 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg text-white text-xs font-semibold transition-all"
+            >
+              {videoState.playbackRate}x
+            </button>
+
+            {showSpeedMenu && (
+              <div className="absolute bottom-full right-0 mb-2 bg-white rounded-xl shadow-xl border border-gray-200 p-2 min-w-[160px] z-50">
+                <div className="space-y-1">
+                  {PLAYBACK_RATES.map((rate) => (
+                    <button
+                      key={rate}
+                      onClick={() => {
+                        setPlaybackRate(rate);
+                        setShowSpeedMenu(false);
+                      }}
+                      className={`w-full px-3 py-1.5 rounded-lg text-xs font-semibold text-left transition-all ${
+                        videoState.playbackRate === rate
+                          ? 'bg-blue-500 text-white'
+                          : 'text-gray-700 hover:bg-gray-100'
+                      }`}
+                    >
+                      {rate}x
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <button
+            onClick={() => setIsFullscreen(true)}
+            className="w-7 h-7 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg text-white flex items-center justify-center transition-all text-sm"
+            title="전체화면"
+          >
+            ⛶
+          </button>
+        </div>
       </div>
     </div>
   );
