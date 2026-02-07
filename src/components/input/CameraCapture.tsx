@@ -13,6 +13,7 @@ const CameraCapture: React.FC = () => {
   const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
   const [selectedDevice, setSelectedDevice] = useState<string>('');
   const [showMenu, setShowMenu] = useState(false);
+  const [showCameraSelector, setShowCameraSelector] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const recordingTimeoutRef = useRef<number | null>(null);
   const recordingStartTimeRef = useRef<number>(0);
@@ -21,6 +22,12 @@ const CameraCapture: React.FC = () => {
   useEffect(() => {
     loadDevices();
   }, []);
+
+  useEffect(() => {
+    if (showCameraSelector) {
+      loadDevices();
+    }
+  }, [showCameraSelector]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -124,47 +131,16 @@ const CameraCapture: React.FC = () => {
   };
 
   return (
-    <div className="flex gap-2 relative">
-      {!isActive ? (
-        <>
+    <>
+      <div className="flex gap-2 relative">
+        {!isActive ? (
           <button
-            onClick={() => handleStartCamera()}
+            onClick={() => setShowCameraSelector(true)}
             className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl font-semibold transition-all shadow-md"
           >
             카메라 녹화
           </button>
-          {devices.length > 1 && (
-            <div className="relative" ref={menuRef}>
-              <button
-                onClick={() => setShowMenu(!showMenu)}
-                className="px-3 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-semibold transition-all"
-              >
-                📹
-              </button>
-              {showMenu && (
-                <div className="absolute top-full right-0 mt-2 bg-white rounded-xl shadow-xl border border-gray-200 p-2 min-w-[200px] z-50">
-                  {devices.map((device, index) => (
-                    <button
-                      key={device.deviceId}
-                      onClick={() => {
-                        setSelectedDevice(device.deviceId);
-                        handleStartCamera(device.deviceId);
-                      }}
-                      className={`w-full px-3 py-2 rounded-lg text-sm text-left transition-all ${
-                        selectedDevice === device.deviceId
-                          ? 'bg-blue-500 text-white'
-                          : 'text-gray-700 hover:bg-gray-100'
-                      }`}
-                    >
-                      {device.label || `카메라 ${index + 1}`}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-        </>
-      ) : (
+        ) : (
         <>
           {!isRecording ? (
             <button
@@ -190,6 +166,48 @@ const CameraCapture: React.FC = () => {
         </>
       )}
     </div>
+
+      {/* Camera Selector Modal */}
+      {showCameraSelector && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-3xl p-6 shadow-2xl max-w-md w-full mx-4">
+            <h3 className="text-xl font-bold text-gray-800 mb-4">카메라 선택</h3>
+
+            {devices.length === 0 ? (
+              <p className="text-gray-600 mb-4">카메라를 찾는 중...</p>
+            ) : (
+              <div className="space-y-2 mb-6">
+                {devices.map((device, index) => (
+                  <button
+                    key={device.deviceId}
+                    onClick={() => {
+                      setSelectedDevice(device.deviceId);
+                      setShowCameraSelector(false);
+                      handleStartCamera(device.deviceId);
+                    }}
+                    className="w-full px-4 py-3 text-left rounded-xl border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition-all"
+                  >
+                    <div className="font-semibold text-gray-800">
+                      {device.label || `카메라 ${index + 1}`}
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      {device.deviceId.substring(0, 20)}...
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            <button
+              onClick={() => setShowCameraSelector(false)}
+              className="w-full px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-semibold transition-all"
+            >
+              취소
+            </button>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 
