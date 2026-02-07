@@ -139,7 +139,7 @@ const ExportDialog: React.FC = () => {
       <button
         onClick={handleDownload}
         disabled={!!progress}
-        className="px-5 py-2.5 bg-blue-700 hover:bg-blue-800 text-white rounded-xl font-semibold transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+        className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white rounded-xl font-semibold transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
       >
         영상 다운로드
       </button>
@@ -149,10 +149,10 @@ const ExportDialog: React.FC = () => {
           style={{
             position: 'fixed',
             bottom: '20px',
-            right: '300px',
+            right: '20px',
             zIndex: 999999
           }}
-          className="bg-white rounded-xl shadow-2xl p-4 w-56"
+          className="bg-white rounded-xl shadow-2xl p-4 w-60"
         >
           <ExportProgress progress={progress} />
         </div>,

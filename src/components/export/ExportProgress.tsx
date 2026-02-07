@@ -23,6 +23,9 @@ const ExportProgress: React.FC<ExportProgressProps> = ({ progress }) => {
         <div className={`text-4xl font-bold ${getStatusColor()}`}>
           {Math.round(progress.progress)}%
         </div>
+        {progress.status === 'encoding' && (
+          <p className="text-xs text-gray-500 mt-1">동영상 다운로드 중..</p>
+        )}
         {progress.status === 'complete' && (
           <p className="text-sm text-green-600 font-semibold mt-1">다운로드 완료</p>
         )}
