@@ -15,7 +15,7 @@ export const usePoseDetection = () => {
   const lastDetectionTime = useRef(0);
 
   useEffect(() => {
-    if (!toolSettings.poseEnabled) return;
+    if (!toolSettings._poseEnabled) return;
 
     const initializePose = async () => {
       if (poseServiceRef.current) return;
@@ -42,10 +42,10 @@ export const usePoseDetection = () => {
         poseServiceRef.current = null;
       }
     };
-  }, [toolSettings.poseEnabled]);
+  }, [toolSettings._poseEnabled]);
 
   useEffect(() => {
-    if (!toolSettings.poseEnabled || !poseServiceRef.current || !videoRef.current) return;
+    if (!toolSettings._poseEnabled || !poseServiceRef.current || !videoRef.current) return;
     if (!videoState.isPlaying) return;
 
     let animationFrameId: number;
@@ -84,7 +84,7 @@ export const usePoseDetection = () => {
         cancelAnimationFrame(animationFrameId);
       }
     };
-  }, [toolSettings.poseEnabled, videoState.isPlaying, videoRef]);
+  }, [toolSettings._poseEnabled, videoState.isPlaying, videoRef]);
 
   return {
     poseResults,

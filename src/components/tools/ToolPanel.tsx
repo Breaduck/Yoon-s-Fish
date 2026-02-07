@@ -2,7 +2,7 @@ import React from 'react';
 import { useTool } from '../../context/ToolContext';
 import { useAnnotations } from '../../context/AnnotationContext';
 import { useVideo } from '../../context/VideoContext';
-import { COLOR_OPTIONS, THICKNESS_OPTIONS } from '../../utils/colors';
+import { COLOR_OPTIONS } from '../../utils/colors';
 import ReferenceLines from './ReferenceLines';
 
 const ToolPanel: React.FC = () => {

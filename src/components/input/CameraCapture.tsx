@@ -14,7 +14,7 @@ const CameraCapture: React.FC = () => {
   const [selectedDevice, setSelectedDevice] = useState<string>('');
   const [showMenu, setShowMenu] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const recordingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const recordingTimeoutRef = useRef<number | null>(null);
   const recordingStartTimeRef = useRef<number>(0);
   const menuRef = useRef<HTMLDivElement>(null);
 

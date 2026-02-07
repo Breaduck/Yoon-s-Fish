@@ -1,5 +1,5 @@
 import { ExportOptions, ExportProgress } from '../types/export';
-import { AnnotationData, ReferenceLine } from '../types/drawing';
+import { AnnotationData } from '../types/drawing';
 import { DrawingEngine } from './drawingEngine';
 
 export class ExportService {

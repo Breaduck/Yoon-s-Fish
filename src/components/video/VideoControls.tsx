@@ -23,7 +23,7 @@ const VideoControls: React.FC = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleCustomSpeedSubmit = () => {
+  const _handleCustomSpeedSubmit = () => {
     const speed = parseFloat(customSpeed);
     if (!isNaN(speed) && speed > 0 && speed <= 4) {
       setPlaybackRate(speed as PlaybackRate);
