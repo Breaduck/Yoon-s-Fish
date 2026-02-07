@@ -14,6 +14,7 @@ import ClipPanel from './components/clips/ClipPanel';
 import VideoUpload from './components/input/VideoUpload';
 import CameraCapture from './components/input/CameraCapture';
 import IPCameraInput from './components/input/IPCameraInput';
+import LiveCameraSelect from './components/input/LiveCameraSelect';
 import ExportDialog from './components/export/ExportDialog';
 
 function AppContent() {
@@ -136,7 +137,7 @@ function AppContent() {
                     </>
                   )}
                   <CameraCapture />
-                  <IPCameraInput />
+                  <LiveCameraSelect />
                   <ExportDialog />
                 </div>
               </div>

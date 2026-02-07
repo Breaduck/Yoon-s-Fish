@@ -15,6 +15,7 @@
     "@mediapipe/camera_utils": "^0.3.1632432234",
     "@mediapipe/drawing_utils": "^0.3.1620248257",
     "@mediapipe/pose": "^0.5.1635989137",
+    "hls.js": "^1.6.15",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },

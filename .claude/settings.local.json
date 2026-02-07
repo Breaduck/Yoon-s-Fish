@@ -15,7 +15,9 @@
       "Bash(done)",
       "Bash(python -m http.server:*)",
       "Bash(wrangler pages deploy:*)",
-      "Bash(npx wrangler deploy:*)"
+      "Bash(npx wrangler deploy:*)",
+      "Bash(powershell:*)",
+      "Bash(./mediamtx.exe:*)"
     ]
   }
 }

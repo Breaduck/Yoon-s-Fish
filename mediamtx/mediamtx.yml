@@ -1,0 +1,12 @@
+# MediaMTX configuration for Axis cameras
+webrtc: yes
+webrtcAddress: :8889
+
+paths:
+  camera1:
+    source: rtsp://root:pass@192.168.0.200/axis-media/media.amp?videocodec=h264
+    sourceProtocol: tcp
+
+  camera2:
+    source: rtsp://root:pass@192.168.0.201/axis-media/media.amp?videocodec=h264
+    sourceProtocol: tcp
