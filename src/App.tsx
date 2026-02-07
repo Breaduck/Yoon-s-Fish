@@ -13,6 +13,7 @@ import ToolPanel from './components/tools/ToolPanel';
 import ClipPanel from './components/clips/ClipPanel';
 import VideoUpload from './components/input/VideoUpload';
 import CameraCapture from './components/input/CameraCapture';
+import IPCameraInput from './components/input/IPCameraInput';
 import ExportDialog from './components/export/ExportDialog';
 
 function AppContent() {
@@ -135,6 +136,7 @@ function AppContent() {
                     </>
                   )}
                   <CameraCapture />
+                  <IPCameraInput />
                   <ExportDialog />
                 </div>
               </div>
