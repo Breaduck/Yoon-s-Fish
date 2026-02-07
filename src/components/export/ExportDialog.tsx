@@ -35,6 +35,36 @@ const ExportDialog: React.FC = () => {
   const { isComparisonMode } = useTool();
   const [progress, setProgress] = useState<ExportProgressType | null>(null);
   const ffmpegRef = useRef<FFmpeg | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
+
+  const handleCancel = () => {
+    // Stop media recorder
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+      mediaRecorderRef.current.stop();
+    }
+
+    // Cancel animation frame
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+    }
+
+    // Reset video playback
+    const video = videoRef.current;
+    const video2 = videoRef2.current;
+    if (video) {
+      video.playbackRate = 1.0;
+      video.muted = false;
+      video.pause();
+    }
+    if (isComparisonMode && video2) {
+      video2.playbackRate = 1.0;
+      video2.muted = false;
+      video2.pause();
+    }
+
+    setProgress(null);
+  };
 
   const handleDownload = async () => {
     const video = videoRef.current;
@@ -74,13 +104,14 @@ const ExportDialog: React.FC = () => {
       const drawingEngine = new DrawingEngine(canvas);
       const stream = canvas.captureStream(30);
 
-      const mediaRecorder = new MediaRecorder(stream, {
+      const recorder = new MediaRecorder(stream, {
         mimeType,
         videoBitsPerSecond: 10000000
       });
+      mediaRecorderRef.current = recorder;
 
       const chunks: Blob[] = [];
-      mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
+      recorder.ondataavailable = (e) => chunks.push(e.data);
 
       setProgress({ status: 'encoding', progress: 10, message: '녹화 중...' });
 
@@ -108,8 +139,8 @@ const ExportDialog: React.FC = () => {
             video2.playbackRate = 1.0;
             video2.muted = false;
           }
-          if (mediaRecorder.state !== 'inactive') {
-            mediaRecorder.stop();
+          if (recorder.state !== 'inactive') {
+            recorder.stop();
           }
           return;
         }
@@ -240,12 +271,12 @@ const ExportDialog: React.FC = () => {
           setProgress({ status: 'encoding', progress: prog, message: '녹화 중...' });
         }
 
-        requestAnimationFrame(renderFrame);
+        animationFrameRef.current = requestAnimationFrame(renderFrame);
       };
 
       const startRecording = async () => {
         try {
-          mediaRecorder.start(100);
+          recorder.start(100);
           const playPromise = video.play();
           if (playPromise !== undefined) {
             await playPromise;
@@ -271,7 +302,7 @@ const ExportDialog: React.FC = () => {
       };
 
       // 녹화 완료 후 속도 복원 핸들러
-      mediaRecorder.onstop = async () => {
+      recorder.onstop = async () => {
         try {
           const webmBlob = new Blob(chunks, { type: mimeType });
 
@@ -355,7 +386,7 @@ const ExportDialog: React.FC = () => {
           }}
           className="bg-white rounded-3xl shadow-xl p-4"
         >
-          <ExportProgress progress={progress} />
+          <ExportProgress progress={progress} onCancel={handleCancel} />
         </div>,
         document.body
       )}

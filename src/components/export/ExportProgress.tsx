@@ -3,9 +3,10 @@ import { ExportProgress as ExportProgressType } from '../../types/export';
 
 interface ExportProgressProps {
   progress: ExportProgressType;
+  onCancel?: () => void;
 }
 
-const ExportProgress: React.FC<ExportProgressProps> = ({ progress }) => {
+const ExportProgress: React.FC<ExportProgressProps> = ({ progress, onCancel }) => {
   const getStatusColor = () => {
     switch (progress.status) {
       case 'complete':
@@ -18,7 +19,15 @@ const ExportProgress: React.FC<ExportProgressProps> = ({ progress }) => {
   };
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-2 relative">
+      {onCancel && progress.status !== 'complete' && progress.status !== 'error' && (
+        <button
+          onClick={onCancel}
+          className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-sm font-bold transition-all"
+        >
+          ×
+        </button>
+      )}
       <div className="text-center">
         <div className={`text-4xl font-bold ${getStatusColor()}`}>
           {Math.round(progress.progress)}%
