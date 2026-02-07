@@ -86,7 +86,7 @@ const ExportDialog: React.FC = () => {
           setProgress({ status: 'encoding', progress: 90 + progress * 10, message: 'MP4 변환 중...' });
         });
 
-        const baseURL = '/ffmpeg';
+        const baseURL = window.location.origin + '/ffmpeg';
         await ffmpeg.load({
           coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
           wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),

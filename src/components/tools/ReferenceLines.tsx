@@ -14,7 +14,7 @@ const ReferenceLines: React.FC = () => {
   useEffect(() => {
     const lines: ReferenceLine[] = [];
 
-    // Add waterline if set
+    // Add waterline if set (always the first/main reference line)
     if (toolSettings.showWaterline && toolSettings.waterlinePosition !== null) {
       lines.push({
         id: 'waterline',
@@ -23,19 +23,41 @@ const ReferenceLines: React.FC = () => {
         color: '#3b82f6', // blue
         thickness: 3,
       });
-    }
 
-    // Generate horizontal lines if enabled
-    if (toolSettings.showHorizontalLines) {
-      const hStep = 100 / (toolSettings.lineCount + 1);
-      for (let i = 1; i <= toolSettings.lineCount; i++) {
-        lines.push({
-          id: `h-line-${i}`,
-          type: 'horizontal',
-          position: hStep * i,
-          color: toolSettings.color,
-          thickness: toolSettings.lineThickness,
-        });
+      // Generate additional horizontal lines if enabled, centered around waterline
+      if (toolSettings.showHorizontalLines && toolSettings.lineCount > 0) {
+        const waterlinePos = toolSettings.waterlinePosition;
+        const step = 100 / (toolSettings.lineCount + 1);
+
+        for (let i = 1; i <= toolSettings.lineCount; i++) {
+          const offset = (i - (toolSettings.lineCount + 1) / 2) * step;
+          const position = waterlinePos + offset;
+
+          // Only add lines that are within bounds (0-100%)
+          if (position > 0 && position < 100 && Math.abs(position - waterlinePos) > 2) {
+            lines.push({
+              id: `h-line-${i}`,
+              type: 'horizontal',
+              position: position,
+              color: toolSettings.color,
+              thickness: toolSettings.lineThickness,
+            });
+          }
+        }
+      }
+    } else {
+      // No waterline - use original behavior
+      if (toolSettings.showHorizontalLines) {
+        const hStep = 100 / (toolSettings.lineCount + 1);
+        for (let i = 1; i <= toolSettings.lineCount; i++) {
+          lines.push({
+            id: `h-line-${i}`,
+            type: 'horizontal',
+            position: hStep * i,
+            color: toolSettings.color,
+            thickness: toolSettings.lineThickness,
+          });
+        }
       }
     }
 
