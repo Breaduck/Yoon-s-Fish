@@ -176,30 +176,61 @@ const CameraCapture: React.FC = () => {
           <div className="bg-white rounded-3xl p-6 shadow-2xl max-w-md w-full mx-4" style={{ maxHeight: '80vh', overflowY: 'auto' }}>
             <h3 className="text-xl font-bold text-gray-800 mb-4">카메라 선택</h3>
 
-            {devices.length === 0 ? (
-              <p className="text-gray-600 mb-4">카메라를 찾는 중...</p>
-            ) : (
-              <div className="space-y-2 mb-6">
-                {devices.map((device, index) => (
+            <div className="space-y-4 mb-6">
+              {/* IP 카메라 (MediaMTX) */}
+              <div>
+                <h4 className="text-sm font-semibold text-gray-700 mb-2">실시간 IP 카메라</h4>
+                <div className="space-y-2">
                   <button
-                    key={device.deviceId}
                     onClick={() => {
-                      setSelectedDevice(device.deviceId);
+                      setSource({ type: 'stream', url: 'http://localhost:8888/camera1/index.m3u8' });
                       setShowCameraSelector(false);
-                      handleStartCamera(device.deviceId);
                     }}
-                    className="w-full px-4 py-3 text-left rounded-xl border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition-all"
+                    className="w-full px-4 py-3 text-left rounded-xl border-2 border-green-200 hover:border-green-500 hover:bg-green-50 transition-all"
                   >
-                    <div className="font-semibold text-gray-800">
-                      {device.label || `카메라 ${index + 1}`}
-                    </div>
-                    <div className="text-sm text-gray-500">
-                      {device.deviceId.substring(0, 20)}...
-                    </div>
+                    <div className="font-semibold text-gray-800">IP 카메라 1 (Before)</div>
+                    <div className="text-sm text-gray-500">192.168.0.200 - MediaMTX</div>
                   </button>
-                ))}
+                  <button
+                    onClick={() => {
+                      setSource({ type: 'stream', url: 'http://localhost:8888/camera2/index.m3u8' });
+                      setShowCameraSelector(false);
+                    }}
+                    className="w-full px-4 py-3 text-left rounded-xl border-2 border-green-200 hover:border-green-500 hover:bg-green-50 transition-all"
+                  >
+                    <div className="font-semibold text-gray-800">IP 카메라 2 (After)</div>
+                    <div className="text-sm text-gray-500">192.168.0.201 - MediaMTX</div>
+                  </button>
+                </div>
               </div>
-            )}
+
+              {/* 로컬 웹캠 */}
+              {devices.length > 0 && (
+                <div>
+                  <h4 className="text-sm font-semibold text-gray-700 mb-2">로컬 웹캠</h4>
+                  <div className="space-y-2">
+                    {devices.map((device, index) => (
+                      <button
+                        key={device.deviceId}
+                        onClick={() => {
+                          setSelectedDevice(device.deviceId);
+                          setShowCameraSelector(false);
+                          handleStartCamera(device.deviceId);
+                        }}
+                        className="w-full px-4 py-3 text-left rounded-xl border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition-all"
+                      >
+                        <div className="font-semibold text-gray-800">
+                          {device.label || `웹캠 ${index + 1}`}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {device.deviceId.substring(0, 20)}...
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
 
             <button
               onClick={() => setShowCameraSelector(false)}
