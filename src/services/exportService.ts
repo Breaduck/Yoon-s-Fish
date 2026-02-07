@@ -212,15 +212,22 @@ export class ExportService {
   }
 
   private getSupportedMimeType(format: 'webm' | 'mp4'): string | null {
-    const types = format === 'webm'
-      ? ['video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm']
-      : ['video/mp4;codecs=h264', 'video/mp4'];
-
-    for (const type of types) {
+    // Try MP4 first regardless of format parameter
+    const mp4Types = ['video/mp4;codecs=h264', 'video/mp4'];
+    for (const type of mp4Types) {
       if (MediaRecorder.isTypeSupported(type)) {
         return type;
       }
     }
+
+    // Fallback to WebM
+    const webmTypes = ['video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm'];
+    for (const type of webmTypes) {
+      if (MediaRecorder.isTypeSupported(type)) {
+        return type;
+      }
+    }
+
     return null;
   }
 
@@ -236,6 +243,12 @@ export class ExportService {
   }
 
   downloadBlob(blob: Blob, filename: string) {
+    // Ensure filename has correct extension based on blob type
+    const extension = blob.type.includes('mp4') ? '.mp4' : '.webm';
+    if (!filename.endsWith(extension)) {
+      filename = filename.replace(/\.(mp4|webm)$/, '') + extension;
+    }
+
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;

@@ -24,6 +24,8 @@ function AppContent() {
 
   // Controls visibility state
   const [showControls, setShowControls] = React.useState(true);
+  const [showControlsVideo1, setShowControlsVideo1] = React.useState(false);
+  const [showControlsVideo2, setShowControlsVideo2] = React.useState(false);
 
   const handleFileUpload = (file: File, isSecondVideo: boolean) => {
     const url = URL.createObjectURL(file);
@@ -151,25 +153,13 @@ function AppContent() {
                     {isComparisonMode ? (
                       <div className="bg-white rounded-3xl overflow-hidden aspect-video relative flex gap-3 p-3 shadow-xl">
                         {/* Before Video - Left */}
-                        <div className="flex-1 relative bg-black rounded-2xl overflow-hidden">
+                        <div
+                          className="flex-1 relative bg-black rounded-2xl overflow-hidden"
+                          onMouseEnter={() => setShowControlsVideo1(true)}
+                          onMouseLeave={() => setShowControlsVideo1(false)}
+                        >
                           <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-xl text-sm font-bold text-gray-800 z-10 shadow-lg">
                             Before
-                          </div>
-                          <div className="absolute top-4 right-4 flex gap-2 z-10">
-                            <button
-                              onClick={playVideo1}
-                              className="w-10 h-10 bg-white/90 hover:bg-white backdrop-blur-sm rounded-lg flex items-center justify-center shadow-lg transition-all"
-                              title="Before 재생"
-                            >
-                              ▶
-                            </button>
-                            <button
-                              onClick={pauseVideo1}
-                              className="w-10 h-10 bg-white/90 hover:bg-white backdrop-blur-sm rounded-lg flex items-center justify-center shadow-lg transition-all"
-                              title="Before 일시정지"
-                            >
-                              ⏸
-                            </button>
                           </div>
                           <VideoPlayer />
                           <VideoCanvas />
@@ -187,28 +177,24 @@ function AppContent() {
                               </div>
                             </div>
                           )}
+                          {/* Video controls overlay - hover to show */}
+                          <div
+                            className={`absolute bottom-0 left-0 right-0 px-6 py-3 transition-opacity duration-300 ${
+                              showControlsVideo1 ? 'opacity-100' : 'opacity-0'
+                            }`}
+                          >
+                            <VideoControls />
+                          </div>
                         </div>
 
                         {/* After Video - Right */}
-                        <div className="flex-1 relative bg-black rounded-2xl overflow-hidden">
+                        <div
+                          className="flex-1 relative bg-black rounded-2xl overflow-hidden"
+                          onMouseEnter={() => setShowControlsVideo2(true)}
+                          onMouseLeave={() => setShowControlsVideo2(false)}
+                        >
                           <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-xl text-sm font-bold text-gray-800 z-10 shadow-lg">
                             After
-                          </div>
-                          <div className="absolute top-4 right-4 flex gap-2 z-10">
-                            <button
-                              onClick={playVideo2}
-                              className="w-10 h-10 bg-white/90 hover:bg-white backdrop-blur-sm rounded-lg flex items-center justify-center shadow-lg transition-all"
-                              title="After 재생"
-                            >
-                              ▶
-                            </button>
-                            <button
-                              onClick={pauseVideo2}
-                              className="w-10 h-10 bg-white/90 hover:bg-white backdrop-blur-sm rounded-lg flex items-center justify-center shadow-lg transition-all"
-                              title="After 일시정지"
-                            >
-                              ⏸
-                            </button>
                           </div>
                           <VideoPlayer2 />
                           <VideoCanvas2 />
@@ -226,6 +212,14 @@ function AppContent() {
                               </div>
                             </div>
                           )}
+                          {/* Video controls overlay - hover to show */}
+                          <div
+                            className={`absolute bottom-0 left-0 right-0 px-6 py-3 transition-opacity duration-300 ${
+                              showControlsVideo2 ? 'opacity-100' : 'opacity-0'
+                            }`}
+                          >
+                            <VideoControls />
+                          </div>
                         </div>
                       </div>
                     ) : (

@@ -145,7 +145,7 @@ const ToolPanel: React.FC = () => {
                 <button
                   key={color.value}
                   onClick={() => updateToolSettings({ color: color.value })}
-                  className={`w-10 h-10 rounded border-2 ${
+                  className={`w-5 h-5 rounded border-2 ${
                     toolSettings.color === color.value
                       ? 'border-white'
                       : 'border-gray-600'
@@ -188,7 +188,7 @@ const ToolPanel: React.FC = () => {
                 <button
                   key={color.value}
                   onClick={() => updateToolSettings({ color: color.value })}
-                  className={`w-10 h-10 rounded border-2 ${
+                  className={`w-5 h-5 rounded border-2 ${
                     toolSettings.color === color.value
                       ? 'border-white'
                       : 'border-gray-600'
@@ -235,7 +235,7 @@ const ToolPanel: React.FC = () => {
                 <button
                   key={color.value}
                   onClick={() => updateToolSettings({ color: color.value })}
-                  className={`w-10 h-10 rounded border-2 ${
+                  className={`w-5 h-5 rounded border-2 ${
                     toolSettings.color === color.value
                       ? 'border-white'
                       : 'border-gray-600'

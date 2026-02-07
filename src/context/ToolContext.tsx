@@ -9,6 +9,7 @@ interface ToolSettings {
   lineCount: number;
   verticalLineCount: number;
   lineThickness: number;
+  showHorizontalLines: boolean;
   showVerticalLines: boolean;
   arrowStyle: ArrowStyle;
   penThickness: number;
@@ -53,6 +54,7 @@ export const ToolProvider: React.FC<ToolProviderProps> = ({ children }) => {
     lineCount: 6,
     verticalLineCount: 1,
     lineThickness: 4,
+    showHorizontalLines: true,
     showVerticalLines: false,
     arrowStyle: 'solid',
     penThickness: 3,
@@ -69,6 +71,7 @@ export const ToolProvider: React.FC<ToolProviderProps> = ({ children }) => {
       lineCount: 6,
       verticalLineCount: 1,
       lineThickness: 4,
+      showHorizontalLines: true,
       showVerticalLines: false,
       arrowStyle: 'solid',
       penThickness: 3,

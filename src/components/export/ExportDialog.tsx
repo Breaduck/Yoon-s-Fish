@@ -23,19 +23,27 @@ const ExportDialog: React.FC = () => {
 
       // Create video stream
       const stream = canvas.captureStream(30);
+
+      // Try MP4 first, fallback to WebM
+      let mimeType = 'video/mp4;codecs=h264';
+      if (!MediaRecorder.isTypeSupported(mimeType)) {
+        mimeType = 'video/webm;codecs=vp9';
+      }
+
       const mediaRecorder = new MediaRecorder(stream, {
-        mimeType: 'video/webm;codecs=vp9',
+        mimeType: mimeType,
         videoBitsPerSecond: 10000000
       });
 
       const chunks: Blob[] = [];
+      const fileExtension = mimeType.includes('mp4') ? 'mp4' : 'webm';
       mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
       mediaRecorder.onstop = () => {
-        const blob = new Blob(chunks, { type: 'video/webm' });
+        const blob = new Blob(chunks, { type: mimeType });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `aquaflux-video-${Date.now()}.webm`;
+        a.download = `aquaflux-video-${Date.now()}.${fileExtension}`;
         a.click();
         URL.revokeObjectURL(url);
       };
