@@ -18,19 +18,22 @@ const ExportProgress: React.FC<ExportProgressProps> = ({ progress }) => {
   };
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       <div className="text-center">
-        <div className={`text-5xl font-bold ${getStatusColor()}`}>
+        <div className={`text-4xl font-bold ${getStatusColor()}`}>
           {Math.round(progress.progress)}%
         </div>
+        {progress.status === 'complete' && (
+          <p className="text-sm text-green-600 font-semibold mt-1">다운로드 완료</p>
+        )}
         {progress.error && (
-          <p className="text-sm text-red-400 mt-2">{progress.error}</p>
+          <p className="text-sm text-red-400 mt-1">{progress.error}</p>
         )}
       </div>
 
       <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
         <div
-          className={`h-full transition-all duration-300 ${
+          className={`h-full ${
             progress.status === 'error'
               ? 'bg-red-500'
               : progress.status === 'complete'

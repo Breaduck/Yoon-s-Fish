@@ -26,26 +26,7 @@ const ExportDialog: React.FC = () => {
         mimeType = 'video/webm;codecs=vp9';
       }
       const fileExtension = mimeType.includes('mp4') ? 'mp4' : 'webm';
-
-      // File System Access API로 저장 위치 선택
-      let fileHandle: any;
-      if ('showSaveFilePicker' in window) {
-        try {
-          fileHandle = await (window as any).showSaveFilePicker({
-            suggestedName: `aquaflux-video-${Date.now()}.${fileExtension}`,
-            types: [{
-              description: 'Video Files',
-              accept: { [mimeType.split(';')[0]]: [`.${fileExtension}`] }
-            }]
-          });
-        } catch (err: any) {
-          if (err.name === 'AbortError') {
-            setProgress(null);
-            return;
-          }
-          throw err;
-        }
-      }
+      const fileName = `aquaflux-video-${Date.now()}.${fileExtension}`;
 
       const canvas = document.createElement('canvas');
       canvas.width = 1920;
@@ -63,24 +44,18 @@ const ExportDialog: React.FC = () => {
 
       const chunks: Blob[] = [];
       mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
-      mediaRecorder.onstop = async () => {
+      mediaRecorder.onstop = () => {
         const blob = new Blob(chunks, { type: mimeType });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
 
-        if (fileHandle) {
-          const writable = await fileHandle.createWritable();
-          await writable.write(blob);
-          await writable.close();
-          setProgress({ status: 'complete', progress: 100, message: '저장 완료!' });
-        } else {
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `aquaflux-video-${Date.now()}.${fileExtension}`;
-          a.click();
-          URL.revokeObjectURL(url);
-          setProgress({ status: 'complete', progress: 100, message: '다운로드 완료!' });
-        }
-
+        setProgress({ status: 'complete', progress: 100, message: '다운로드 완료!' });
         setTimeout(() => setProgress(null), 3000);
       };
 
@@ -174,10 +149,10 @@ const ExportDialog: React.FC = () => {
           style={{
             position: 'fixed',
             bottom: '20px',
-            right: '20px',
+            right: '300px',
             zIndex: 999999
           }}
-          className="bg-white rounded-2xl shadow-2xl p-6 w-80"
+          className="bg-white rounded-xl shadow-2xl p-4 w-56"
         >
           <ExportProgress progress={progress} />
         </div>,
