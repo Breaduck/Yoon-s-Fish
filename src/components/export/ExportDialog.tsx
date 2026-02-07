@@ -86,7 +86,10 @@ const ExportDialog: React.FC = () => {
       }
 
       const renderFrame = () => {
-        if (video.ended) {
+        const isVideo1Ended = video.ended;
+        const isVideo2Ended = isComparison && video2 ? video2.ended : true;
+
+        if (isVideo1Ended && isVideo2Ended) {
           video.playbackRate = 1.0;
           video.muted = false;
           if (isComparison && video2) {
@@ -130,9 +133,35 @@ const ExportDialog: React.FC = () => {
         const currentDrawings = annotations.freeDrawings.filter(d => d.timestamp <= currentTime);
         const currentAngles = annotations.angles.filter(a => a.timestamp <= currentTime);
 
-        drawingEngine.drawArrows(currentArrows);
-        drawingEngine.drawFreeDrawings(currentDrawings);
-        drawingEngine.drawAngles(currentAngles);
+        if (isComparison) {
+          // 비교 모드: videoIndex에 따라 좌표 변환
+          const beforeArrows = currentArrows.filter(a => !a.videoIndex || a.videoIndex === 0);
+          const afterArrows = currentArrows.filter(a => a.videoIndex === 1).map(a => ({
+            ...a,
+            start: { x: a.start.x + 1920, y: a.start.y },
+            end: { x: a.end.x + 1920, y: a.end.y }
+          }));
+
+          const beforeDrawings = currentDrawings.filter(d => !d.videoIndex || d.videoIndex === 0);
+          const afterDrawings = currentDrawings.filter(d => d.videoIndex === 1).map(d => ({
+            ...d,
+            points: d.points.map(p => ({ x: p.x + 1920, y: p.y }))
+          }));
+
+          const beforeAngles = currentAngles.filter(a => !a.videoIndex || a.videoIndex === 0);
+          const afterAngles = currentAngles.filter(a => a.videoIndex === 1).map(a => ({
+            ...a,
+            points: a.points.map(p => ({ x: p.x + 1920, y: p.y })) as [any, any, any]
+          }));
+
+          drawingEngine.drawArrows([...beforeArrows, ...afterArrows]);
+          drawingEngine.drawFreeDrawings([...beforeDrawings, ...afterDrawings]);
+          drawingEngine.drawAngles([...beforeAngles, ...afterAngles]);
+        } else {
+          drawingEngine.drawArrows(currentArrows);
+          drawingEngine.drawFreeDrawings(currentDrawings);
+          drawingEngine.drawAngles(currentAngles);
+        }
 
         if (video.duration) {
           const prog = Math.min(90, 10 + (video.currentTime / video.duration) * 80);
