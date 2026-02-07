@@ -1,12 +1,14 @@
 import React from 'react';
 import { useTool } from '../../context/ToolContext';
 import { useAnnotations } from '../../context/AnnotationContext';
+import { useVideo } from '../../context/VideoContext';
 import { COLOR_OPTIONS, THICKNESS_OPTIONS } from '../../utils/colors';
 import ReferenceLines from './ReferenceLines';
 
 const ToolPanel: React.FC = () => {
-  const { activeTool, setActiveTool, toolSettings, updateToolSettings, resetSettings, isToolPanelCollapsed, setIsToolPanelCollapsed } = useTool();
+  const { activeTool, setActiveTool, toolSettings, updateToolSettings, resetSettings, isToolPanelCollapsed, setIsToolPanelCollapsed, isComparisonMode } = useTool();
   const { clearDrawings, setReferenceLines } = useAnnotations();
+  const { playBoth } = useVideo();
 
   const handleReset = () => {
     resetSettings();
@@ -259,6 +261,19 @@ const ToolPanel: React.FC = () => {
               ))}
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Comparison Mode Play Button */}
+      {isComparisonMode && (
+        <div className="pt-5 border-t border-gray-200 mt-5">
+          <button
+            onClick={playBoth}
+            className="w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white rounded-xl font-semibold transition-all shadow-md flex items-center justify-center gap-2"
+          >
+            <span>⏯</span>
+            <span>동시 시작</span>
+          </button>
         </div>
       )}
       </>

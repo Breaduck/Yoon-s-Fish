@@ -7,6 +7,26 @@ import { DrawingEngine } from '../../services/drawingEngine';
 import ExportProgress from './ExportProgress';
 import { ExportProgress as ExportProgressType } from '../../types/export';
 
+// Helper functions for rounded rectangles
+const drawRoundedRect = (ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, radius: number) => {
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y);
+  ctx.lineTo(x + width - radius, y);
+  ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+  ctx.lineTo(x + width, y + height - radius);
+  ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+  ctx.lineTo(x + radius, y + height);
+  ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+  ctx.lineTo(x, y + radius);
+  ctx.quadraticCurveTo(x, y, x + radius, y);
+  ctx.closePath();
+};
+
+const clipRoundedRect = (ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, radius: number) => {
+  drawRoundedRect(ctx, x, y, width, height, radius);
+  ctx.clip();
+};
+
 const ExportDialog: React.FC = () => {
   const { videoRef, videoRef2, videoState, secondVideoSource } = useVideo();
   const { annotations } = useAnnotations();
@@ -35,7 +55,8 @@ const ExportDialog: React.FC = () => {
       const isComparison = isComparisonMode && video2 && secondVideoSource;
 
       if (isComparison) {
-        canvas.width = 1920 * 2;
+        // 비교 모드: 전체 레이아웃 포함 (aspect-video with gap and padding)
+        canvas.width = 1920;
         canvas.height = 1080;
       } else {
         canvas.width = 1920;
@@ -90,20 +111,59 @@ const ExportDialog: React.FC = () => {
 
         if (video.paused) return;
 
-        // 비교 모드: 두 영상을 side-by-side로 렌더링
+        // 비교 모드: 현재 UI 레이아웃 그대로
         if (isComparison && video2) {
-          ctx.drawImage(video, 0, 0, 1920, 1080);
-          ctx.drawImage(video2, 1920, 0, 1920, 1080);
+          // 흰색 배경
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-          // Before/After 라벨
+          // 패딩과 간격 계산 (p-3 = 12px, gap-3 = 12px)
+          const padding = 30;
+          const gap = 30;
+          const videoWidth = (canvas.width - padding * 2 - gap) / 2;
+          const videoHeight = canvas.height - padding * 2;
+          const cornerRadius = 20;
+
+          // 검은색 배경 (Before - 좌측)
+          ctx.fillStyle = '#000000';
+          drawRoundedRect(ctx, padding, padding, videoWidth, videoHeight, cornerRadius);
+          ctx.fill();
+
+          // Before 비디오
+          ctx.save();
+          clipRoundedRect(ctx, padding, padding, videoWidth, videoHeight, cornerRadius);
+          ctx.drawImage(video, padding, padding, videoWidth, videoHeight);
+          ctx.restore();
+
+          // 검은색 배경 (After - 우측)
+          ctx.fillStyle = '#000000';
+          drawRoundedRect(ctx, padding + videoWidth + gap, padding, videoWidth, videoHeight, cornerRadius);
+          ctx.fill();
+
+          // After 비디오
+          ctx.save();
+          clipRoundedRect(ctx, padding + videoWidth + gap, padding, videoWidth, videoHeight, cornerRadius);
+          ctx.drawImage(video2, padding + videoWidth + gap, padding, videoWidth, videoHeight);
+          ctx.restore();
+
+          // Before 라벨 (둥근 네모)
           ctx.save();
           ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-          ctx.fillRect(20, 20, 150, 60);
-          ctx.fillRect(1940, 20, 150, 60);
-          ctx.fillStyle = '#1e40af';
-          ctx.font = 'bold 32px sans-serif';
-          ctx.fillText('Before', 40, 62);
-          ctx.fillText('After', 1960, 62);
+          drawRoundedRect(ctx, padding + 20, padding + 20, 120, 50, 12);
+          ctx.fill();
+          ctx.fillStyle = '#083985';
+          ctx.font = 'bold 24px sans-serif';
+          ctx.fillText('Before', padding + 40, padding + 50);
+          ctx.restore();
+
+          // After 라벨 (둥근 네모)
+          ctx.save();
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+          drawRoundedRect(ctx, padding + videoWidth + gap + 20, padding + 20, 120, 50, 12);
+          ctx.fill();
+          ctx.fillStyle = '#083985';
+          ctx.font = 'bold 24px sans-serif';
+          ctx.fillText('After', padding + videoWidth + gap + 40, padding + 50);
           ctx.restore();
         } else {
           ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
@@ -121,23 +181,42 @@ const ExportDialog: React.FC = () => {
 
         if (isComparison) {
           // 비교 모드: videoIndex에 따라 좌표 변환
-          const beforeArrows = currentArrows.filter(a => !a.videoIndex || a.videoIndex === 0);
+          // 새 레이아웃에서 각 비디오 크기와 위치
+          const scaleX = videoWidth / canvas.width;
+          const scaleY = videoHeight / canvas.height;
+
+          // Before 비디오 주석 (좌측)
+          const beforeArrows = currentArrows.filter(a => !a.videoIndex || a.videoIndex === 0).map(a => ({
+            ...a,
+            start: { x: a.start.x * scaleX + padding, y: a.start.y * scaleY + padding },
+            end: { x: a.end.x * scaleX + padding, y: a.end.y * scaleY + padding }
+          }));
+
+          // After 비디오 주석 (우측)
           const afterArrows = currentArrows.filter(a => a.videoIndex === 1).map(a => ({
             ...a,
-            start: { x: a.start.x + 1920, y: a.start.y },
-            end: { x: a.end.x + 1920, y: a.end.y }
+            start: { x: a.start.x * scaleX + padding + videoWidth + gap, y: a.start.y * scaleY + padding },
+            end: { x: a.end.x * scaleX + padding + videoWidth + gap, y: a.end.y * scaleY + padding }
           }));
 
-          const beforeDrawings = currentDrawings.filter(d => !d.videoIndex || d.videoIndex === 0);
+          const beforeDrawings = currentDrawings.filter(d => !d.videoIndex || d.videoIndex === 0).map(d => ({
+            ...d,
+            points: d.points.map(p => ({ x: p.x * scaleX + padding, y: p.y * scaleY + padding }))
+          }));
+
           const afterDrawings = currentDrawings.filter(d => d.videoIndex === 1).map(d => ({
             ...d,
-            points: d.points.map(p => ({ x: p.x + 1920, y: p.y }))
+            points: d.points.map(p => ({ x: p.x * scaleX + padding + videoWidth + gap, y: p.y * scaleY + padding }))
           }));
 
-          const beforeAngles = currentAngles.filter(a => !a.videoIndex || a.videoIndex === 0);
+          const beforeAngles = currentAngles.filter(a => !a.videoIndex || a.videoIndex === 0).map(a => ({
+            ...a,
+            points: a.points.map(p => ({ x: p.x * scaleX + padding, y: p.y * scaleY + padding })) as [any, any, any]
+          }));
+
           const afterAngles = currentAngles.filter(a => a.videoIndex === 1).map(a => ({
             ...a,
-            points: a.points.map(p => ({ x: p.x + 1920, y: p.y })) as [any, any, any]
+            points: a.points.map(p => ({ x: p.x * scaleX + padding + videoWidth + gap, y: p.y * scaleY + padding })) as [any, any, any]
           }));
 
           drawingEngine.drawArrows([...beforeArrows, ...afterArrows]);

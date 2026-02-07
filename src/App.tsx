@@ -258,21 +258,6 @@ function AppContent() {
                       </div>
                     )}
 
-                    {/* Video controls for comparison mode */}
-                    {isComparisonMode && (
-                      <div className="space-y-3">
-                        <div className="flex justify-center">
-                          <button
-                            onClick={playBoth}
-                            className="px-6 py-3 bg-blue-700 hover:bg-blue-800 text-white rounded-xl font-bold transition-all shadow-md flex items-center gap-2"
-                          >
-                            <span>⏯</span>
-                            <span>동시 시작 (처음부터)</span>
-                          </button>
-                        </div>
-                        <VideoControls key={`controls-${secondVideoSource?.url || 'none'}`} />
-                      </div>
-                    )}
                   </div>
                 </main>
 
