@@ -80,7 +80,7 @@ const ToolPanel: React.FC = () => {
               : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
           }`}
         >
-          자유 그리기
+          그리기
         </button>
 
         <button

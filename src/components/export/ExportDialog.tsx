@@ -1,6 +1,7 @@
 import React from 'react';
 import { useVideo } from '../../context/VideoContext';
 import { useAnnotations } from '../../context/AnnotationContext';
+import { DrawingEngine } from '../../services/drawingEngine';
 
 const ExportDialog: React.FC = () => {
   const { videoRef, videoState } = useVideo();
@@ -14,24 +15,22 @@ const ExportDialog: React.FC = () => {
     }
 
     try {
-      // Create canvas for rendering
       const canvas = document.createElement('canvas');
       canvas.width = 1920;
       canvas.height = 1080;
       const ctx = canvas.getContext('2d');
       if (!ctx) return;
 
-      // Create video stream
+      const drawingEngine = new DrawingEngine(canvas);
       const stream = canvas.captureStream(30);
 
-      // Try MP4 first, fallback to WebM
       let mimeType = 'video/mp4;codecs=h264';
       if (!MediaRecorder.isTypeSupported(mimeType)) {
         mimeType = 'video/webm;codecs=vp9';
       }
 
       const mediaRecorder = new MediaRecorder(stream, {
-        mimeType: mimeType,
+        mimeType,
         videoBitsPerSecond: 10000000
       });
 
@@ -49,26 +48,47 @@ const ExportDialog: React.FC = () => {
       };
 
       mediaRecorder.start();
-
-      // Record video with annotations
       video.currentTime = 0;
-      const duration = video.duration;
-      const fps = 30;
-      const frameTime = 1000 / fps;
 
-      for (let t = 0; t < duration; t += 1 / fps) {
-        video.currentTime = t;
-        await new Promise(resolve => setTimeout(resolve, frameTime));
+      const renderFrame = () => {
+        if (video.ended || video.paused) {
+          return;
+        }
 
-        // Draw video frame
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-        // Draw annotations for current time
-        const currentTime = Math.floor(t * 1000);
-        // Add annotation drawing logic here if needed
-      }
+        const currentTime = Math.floor(video.currentTime * 1000);
 
-      mediaRecorder.stop();
+        if (annotations.referenceLines.length > 0) {
+          drawingEngine.drawReferenceLines(annotations.referenceLines);
+        }
+
+        const currentArrows = annotations.arrows.filter(a => a.timestamp <= currentTime);
+        const currentDrawings = annotations.freeDrawings.filter(d => d.timestamp <= currentTime);
+        const currentAngles = annotations.angles.filter(a => a.timestamp <= currentTime);
+
+        drawingEngine.drawArrows(currentArrows);
+        drawingEngine.drawFreeDrawings(currentDrawings);
+        drawingEngine.drawAngles(currentAngles);
+
+        requestAnimationFrame(renderFrame);
+      };
+
+      video.onended = () => {
+        if (mediaRecorder.state !== 'inactive') {
+          mediaRecorder.stop();
+        }
+      };
+
+      if (video.readyState >= 2) {
+        video.play();
+        requestAnimationFrame(renderFrame);
+      } else {
+        video.addEventListener('loadeddata', () => {
+          video.play();
+          requestAnimationFrame(renderFrame);
+        }, { once: true });
+      }
     } catch (error) {
       console.error('Download error:', error);
       alert('다운로드 중 오류가 발생했습니다.');

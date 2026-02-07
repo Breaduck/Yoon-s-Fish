@@ -113,7 +113,7 @@ function AppContent() {
                     <span className="text-white font-bold text-xl">A</span>
                   </div>
                   <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-emerald-600 bg-clip-text text-transparent">
-                    AquaFlux
+                    AQUAFLUX
                   </h1>
                 </div>
                 <div className="flex gap-3">
