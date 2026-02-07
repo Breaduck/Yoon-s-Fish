@@ -1,17 +1,14 @@
-/*
-  X-Content-Type-Options: nosniff
+/assets/*.js
+  Content-Type: text/javascript
+
+/assets/*.css
+  Content-Type: text/css
 
 /*.js
-  Content-Type: application/javascript; charset=utf-8
+  Content-Type: text/javascript
 
 /*.mjs
-  Content-Type: application/javascript; charset=utf-8
+  Content-Type: text/javascript
 
-/*.css
-  Content-Type: text/css; charset=utf-8
-
-/*.json
-  Content-Type: application/json; charset=utf-8
-
-/*.wasm
-  Content-Type: application/wasm
+/*
+  X-Content-Type-Options: nosniff
