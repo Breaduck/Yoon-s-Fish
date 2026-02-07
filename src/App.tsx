@@ -137,10 +137,10 @@ function AppContent() {
             </header>
 
             {/* Main content */}
-            <div style={{ maxWidth: '98vw', margin: '0 auto', padding: '1.5rem' }}>
+            <div className="container mx-auto px-6 py-6">
               <div className="flex gap-3">
                 {/* Tool panel */}
-                <aside className="flex-shrink-0" style={{ width: '160px' }}>
+                <aside className="flex-shrink-0" style={{ width: '200px' }}>
                   <ToolPanel />
                 </aside>
 
