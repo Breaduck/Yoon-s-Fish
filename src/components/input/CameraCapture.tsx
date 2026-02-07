@@ -124,7 +124,7 @@ const CameraCapture: React.FC = () => {
         <>
           <button
             onClick={() => handleStartCamera()}
-            className="px-5 py-2.5 bg-gradient-to-r from-blue-500 to-cyan-500 hover:shadow-lg text-white rounded-xl font-semibold transition-all shadow-md shadow-blue-500/30"
+            className="px-5 py-2.5 bg-blue-700 hover:bg-blue-800 text-white rounded-xl font-semibold transition-all shadow-md"
           >
             카메라 녹화
           </button>
@@ -164,21 +164,21 @@ const CameraCapture: React.FC = () => {
           {!isRecording ? (
             <button
               onClick={startRecording}
-              className="px-5 py-2.5 bg-gradient-to-r from-green-500 to-emerald-500 hover:shadow-lg text-white rounded-xl font-semibold transition-all shadow-md shadow-green-500/30"
+              className="px-5 py-2.5 bg-blue-700 hover:bg-blue-800 text-white rounded-xl font-semibold transition-all shadow-md"
             >
               ● 녹화 시작
             </button>
           ) : (
             <button
               onClick={stopRecording}
-              className="px-5 py-2.5 bg-gradient-to-r from-orange-500 to-red-500 hover:shadow-lg text-white rounded-xl font-semibold transition-all shadow-md shadow-orange-500/30 animate-pulse"
+              className="px-5 py-2.5 bg-blue-700 hover:bg-blue-800 text-white rounded-xl font-semibold transition-all shadow-md animate-pulse"
             >
               ■ 녹화 중...
             </button>
           )}
           <button
             onClick={handleStopCamera}
-            className="px-5 py-2.5 bg-gradient-to-r from-red-500 to-pink-500 hover:shadow-lg text-white rounded-xl font-semibold transition-all shadow-md shadow-red-500/30"
+            className="px-5 py-2.5 bg-blue-700 hover:bg-blue-800 text-white rounded-xl font-semibold transition-all shadow-md"
           >
             카메라 중지
           </button>
