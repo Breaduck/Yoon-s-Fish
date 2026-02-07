@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { ArrowStyle } from '../types/drawing';
 
-export type ToolType = 'reference-lines' | 'arrow' | 'pen' | 'eraser' | 'angle' | 'set-waterline' | null;
+export type ToolType = 'reference-lines' | 'arrow' | 'pen' | 'eraser' | 'angle' | null;
 
 interface ToolSettings {
   color: string;
@@ -13,6 +13,8 @@ interface ToolSettings {
   showVerticalLines: boolean;
   arrowStyle: ArrowStyle;
   penThickness: number;
+  waterlinePosition: number | null;
+  showWaterline: boolean;
 }
 
 interface ToolContextType {
@@ -48,6 +50,21 @@ export const ToolProvider: React.FC<ToolProviderProps> = ({ children }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isComparisonMode, setIsComparisonMode] = useState(false);
   const [isToolPanelCollapsed, setIsToolPanelCollapsed] = useState(false);
+
+  // Load waterline from localStorage
+  const loadWaterline = () => {
+    try {
+      const saved = localStorage.getItem('aquaflux_waterline');
+      if (saved) {
+        const { yPercent } = JSON.parse(saved);
+        return yPercent;
+      }
+    } catch (e) {
+      console.error('Failed to load waterline:', e);
+    }
+    return null;
+  };
+
   const [toolSettings, setToolSettings] = useState<ToolSettings>({
     color: '#10b981', // emerald
     thickness: 4,
@@ -58,6 +75,8 @@ export const ToolProvider: React.FC<ToolProviderProps> = ({ children }) => {
     showVerticalLines: false,
     arrowStyle: 'solid',
     penThickness: 3,
+    waterlinePosition: loadWaterline(),
+    showWaterline: true,
   });
 
   const updateToolSettings = (settings: Partial<ToolSettings>) => {
@@ -75,6 +94,8 @@ export const ToolProvider: React.FC<ToolProviderProps> = ({ children }) => {
       showVerticalLines: false,
       arrowStyle: 'solid',
       penThickness: 3,
+      waterlinePosition: loadWaterline(),
+      showWaterline: true,
     });
     setActiveTool(null);
   };
