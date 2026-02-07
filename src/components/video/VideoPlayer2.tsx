@@ -9,9 +9,17 @@ const VideoPlayer2: React.FC = () => {
     if (!video || !secondVideoSource) return;
 
     if (secondVideoSource.type === 'file' && secondVideoSource.url) {
+      video.srcObject = null;
       video.src = secondVideoSource.url;
+      video.load();
     } else if (secondVideoSource.type === 'camera' && secondVideoSource.stream) {
+      video.src = '';
       video.srcObject = secondVideoSource.stream;
+    } else if (secondVideoSource.type === 'stream' && secondVideoSource.url) {
+      video.srcObject = null;
+      video.src = secondVideoSource.url;
+      video.load();
+      video.play().catch(err => console.log('Auto-play prevented:', err));
     }
   }, [videoRef2, secondVideoSource]);
 

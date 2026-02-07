@@ -15,6 +15,11 @@ const VideoPlayer: React.FC = () => {
     } else if (videoState.source.type === 'camera' && videoState.source.stream) {
       video.src = '';
       video.srcObject = videoState.source.stream;
+    } else if (videoState.source.type === 'stream' && videoState.source.url) {
+      video.srcObject = null;
+      video.src = videoState.source.url;
+      video.load();
+      video.play().catch(err => console.log('Auto-play prevented:', err));
     }
   }, [videoRef, videoState.source]);
 
