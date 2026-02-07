@@ -168,12 +168,16 @@ function AppContent() {
                               </div>
                             </div>
                           )}
+                          {/* Video controls overlay - inside video for single mode */}
+                          <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
+                            <VideoControls />
+                          </div>
                         </div>
                       </div>
                     )}
 
-                    {/* Video controls */}
-                    <VideoControls />
+                    {/* Video controls for comparison mode */}
+                    {isComparisonMode && <VideoControls />}
                   </div>
                 </main>
               </div>

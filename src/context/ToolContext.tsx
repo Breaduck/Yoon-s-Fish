@@ -24,6 +24,8 @@ interface ToolContextType {
   setIsFullscreen: (fullscreen: boolean) => void;
   isComparisonMode: boolean;
   setIsComparisonMode: (enabled: boolean) => void;
+  isToolPanelCollapsed: boolean;
+  setIsToolPanelCollapsed: (collapsed: boolean) => void;
 }
 
 const ToolContext = createContext<ToolContextType | null>(null);
@@ -44,6 +46,7 @@ export const ToolProvider: React.FC<ToolProviderProps> = ({ children }) => {
   const [activeTool, setActiveTool] = useState<ToolType>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isComparisonMode, setIsComparisonMode] = useState(false);
+  const [isToolPanelCollapsed, setIsToolPanelCollapsed] = useState(false);
   const [toolSettings, setToolSettings] = useState<ToolSettings>({
     color: '#10b981', // emerald
     thickness: 4,
@@ -85,6 +88,8 @@ export const ToolProvider: React.FC<ToolProviderProps> = ({ children }) => {
         setIsFullscreen,
         isComparisonMode,
         setIsComparisonMode,
+        isToolPanelCollapsed,
+        setIsToolPanelCollapsed,
       }}
     >
       {children}

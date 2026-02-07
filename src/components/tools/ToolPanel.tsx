@@ -5,7 +5,7 @@ import { COLOR_OPTIONS, THICKNESS_OPTIONS } from '../../utils/colors';
 import ReferenceLines from './ReferenceLines';
 
 const ToolPanel: React.FC = () => {
-  const { activeTool, setActiveTool, toolSettings, updateToolSettings, resetSettings } = useTool();
+  const { activeTool, setActiveTool, toolSettings, updateToolSettings, resetSettings, isToolPanelCollapsed, setIsToolPanelCollapsed } = useTool();
   const { clearDrawings, setReferenceLines } = useAnnotations();
 
   const handleReset = () => {
@@ -27,14 +27,26 @@ const ToolPanel: React.FC = () => {
     <div className="w-full bg-white rounded-3xl p-4 shadow-xl space-y-4">
       <div className="flex items-center justify-between mb-2">
         <h2 className="text-xl font-bold text-gray-800">도구</h2>
-        <button
-          onClick={handleReset}
-          className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm rounded-xl font-semibold transition-all"
-          title="설정 및 그림 초기화"
-        >
-          초기화
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={handleReset}
+            className="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm rounded-xl font-semibold transition-all"
+            title="설정 및 그림 초기화"
+          >
+            초기화
+          </button>
+          <button
+            onClick={() => setIsToolPanelCollapsed(!isToolPanelCollapsed)}
+            className="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm rounded-xl font-semibold transition-all"
+            title={isToolPanelCollapsed ? "펼치기" : "접기"}
+          >
+            {isToolPanelCollapsed ? '›' : '‹'}
+          </button>
+        </div>
       </div>
+
+      {!isToolPanelCollapsed && (
+        <>
 
       {/* Tool buttons */}
       <div className="space-y-2">
@@ -235,6 +247,8 @@ const ToolPanel: React.FC = () => {
             </div>
           </div>
         </div>
+      )}
+      </>
       )}
     </div>
   );
