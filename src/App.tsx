@@ -15,7 +15,7 @@ import ExportDialog from './components/export/ExportDialog';
 
 function AppContent() {
   const { isComparisonMode, setIsComparisonMode } = useTool();
-  const { videoState, secondVideoSource, setSource, setSource2 } = useVideo();
+  const { videoState, secondVideoSource, setSource, setSource2, playVideo1, pauseVideo1, playVideo2, pauseVideo2, playBoth } = useVideo();
   const { annotations, removeArrow, removeFreeDraw, removeAngle } = useAnnotations();
 
   // Hidden file inputs for click-to-upload
@@ -160,6 +160,22 @@ function AppContent() {
                           <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-xl text-sm font-bold text-gray-800 z-10 shadow-lg">
                             Before
                           </div>
+                          <div className="absolute top-4 right-4 flex gap-2 z-10">
+                            <button
+                              onClick={playVideo1}
+                              className="w-10 h-10 bg-white/90 hover:bg-white backdrop-blur-sm rounded-lg flex items-center justify-center shadow-lg transition-all"
+                              title="Before 재생"
+                            >
+                              ▶
+                            </button>
+                            <button
+                              onClick={pauseVideo1}
+                              className="w-10 h-10 bg-white/90 hover:bg-white backdrop-blur-sm rounded-lg flex items-center justify-center shadow-lg transition-all"
+                              title="Before 일시정지"
+                            >
+                              ⏸
+                            </button>
+                          </div>
                           <VideoPlayer />
                           <VideoCanvas />
                           {/* Empty state upload icon for Before video */}
@@ -182,6 +198,22 @@ function AppContent() {
                         <div className="flex-1 relative bg-black rounded-2xl overflow-hidden">
                           <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-xl text-sm font-bold text-gray-800 z-10 shadow-lg">
                             After
+                          </div>
+                          <div className="absolute top-4 right-4 flex gap-2 z-10">
+                            <button
+                              onClick={playVideo2}
+                              className="w-10 h-10 bg-white/90 hover:bg-white backdrop-blur-sm rounded-lg flex items-center justify-center shadow-lg transition-all"
+                              title="After 재생"
+                            >
+                              ▶
+                            </button>
+                            <button
+                              onClick={pauseVideo2}
+                              className="w-10 h-10 bg-white/90 hover:bg-white backdrop-blur-sm rounded-lg flex items-center justify-center shadow-lg transition-all"
+                              title="After 일시정지"
+                            >
+                              ⏸
+                            </button>
                           </div>
                           <VideoPlayer2 />
                           <VideoCanvas2 />
@@ -229,7 +261,20 @@ function AppContent() {
                     )}
 
                     {/* Video controls for comparison mode */}
-                    {isComparisonMode && <VideoControls />}
+                    {isComparisonMode && (
+                      <div className="space-y-3">
+                        <div className="flex justify-center">
+                          <button
+                            onClick={playBoth}
+                            className="px-6 py-3 bg-gradient-to-r from-blue-500 to-emerald-500 hover:shadow-lg text-white rounded-xl font-bold transition-all shadow-md shadow-blue-500/30 flex items-center gap-2"
+                          >
+                            <span>⏯</span>
+                            <span>동시 시작 (처음부터)</span>
+                          </button>
+                        </div>
+                        <VideoControls />
+                      </div>
+                    )}
                   </div>
                 </main>
               </div>

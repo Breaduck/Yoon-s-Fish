@@ -10,6 +10,11 @@ interface VideoContextType {
   secondVideoSource: VideoSource | null;
   play: () => void;
   pause: () => void;
+  playVideo1: () => void;
+  pauseVideo1: () => void;
+  playVideo2: () => void;
+  pauseVideo2: () => void;
+  playBoth: () => void;
   setPlaybackRate: (rate: PlaybackRate) => void;
   seek: (time: number) => void;
   updateTime: (time: number) => void;
@@ -69,6 +74,42 @@ export const VideoProvider: React.FC<VideoProviderProps> = ({ children }) => {
     setVideoState((prev) => ({ ...prev, isPlaying: false }));
   };
 
+  const playVideo1 = () => {
+    if (videoRef.current) {
+      videoRef.current.play();
+    }
+  };
+
+  const pauseVideo1 = () => {
+    if (videoRef.current) {
+      videoRef.current.pause();
+    }
+  };
+
+  const playVideo2 = () => {
+    if (videoRef2.current && secondVideoSource) {
+      videoRef2.current.play();
+    }
+  };
+
+  const pauseVideo2 = () => {
+    if (videoRef2.current && secondVideoSource) {
+      videoRef2.current.pause();
+    }
+  };
+
+  const playBoth = () => {
+    if (videoRef.current) {
+      videoRef.current.currentTime = 0;
+      videoRef.current.play();
+    }
+    if (videoRef2.current && secondVideoSource) {
+      videoRef2.current.currentTime = 0;
+      videoRef2.current.play();
+    }
+    setVideoState((prev) => ({ ...prev, isPlaying: true }));
+  };
+
   const setPlaybackRate = (rate: PlaybackRate) => {
     if (videoRef.current) {
       videoRef.current.playbackRate = rate;
@@ -109,6 +150,11 @@ export const VideoProvider: React.FC<VideoProviderProps> = ({ children }) => {
         secondVideoSource,
         play,
         pause,
+        playVideo1,
+        pauseVideo1,
+        playVideo2,
+        pauseVideo2,
+        playBoth,
         setPlaybackRate,
         seek,
         updateTime,
