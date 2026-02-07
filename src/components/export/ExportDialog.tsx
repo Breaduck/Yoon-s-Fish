@@ -55,20 +55,6 @@ const ExportDialog: React.FC = () => {
 
       const chunks: Blob[] = [];
       mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
-      mediaRecorder.onstop = () => {
-        const blob = new Blob(chunks, { type: mimeType });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = fileName;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-
-        setProgress({ status: 'complete', progress: 100, message: '다운로드 완료!' });
-        setTimeout(() => setProgress(null), 3000);
-      };
 
       setProgress({ status: 'encoding', progress: 10, message: '녹화 중...' });
 
@@ -198,7 +184,34 @@ const ExportDialog: React.FC = () => {
         }
       };
 
+      // 녹화 완료 후 속도 복원 핸들러
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(chunks, { type: mimeType });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        // 속도 복원
+        video.playbackRate = 1.0;
+        video.muted = false;
+        if (isComparison && video2) {
+          video2.playbackRate = 1.0;
+          video2.muted = false;
+        }
+
+        setProgress({ status: 'complete', progress: 100, message: '다운로드 완료!' });
+        setTimeout(() => setProgress(null), 3000);
+      };
+
       video.load();
+      if (isComparison && video2) {
+        video2.load();
+      }
 
       if (video.readyState >= 2) {
         startRecording();
