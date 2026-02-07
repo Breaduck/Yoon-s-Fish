@@ -20,7 +20,10 @@ const ExportProgress: React.FC<ExportProgressProps> = ({ progress }) => {
   return (
     <div className="space-y-4">
       <div className="text-center">
-        <p className={`text-lg font-semibold ${getStatusColor()}`}>
+        <div className={`text-4xl font-bold mb-2 ${getStatusColor()}`}>
+          {Math.round(progress.progress)}%
+        </div>
+        <p className={`text-sm font-semibold ${getStatusColor()}`}>
           {progress.message}
         </p>
         {progress.error && (
@@ -28,7 +31,7 @@ const ExportProgress: React.FC<ExportProgressProps> = ({ progress }) => {
         )}
       </div>
 
-      <div className="w-full bg-gray-700 rounded-full h-4 overflow-hidden">
+      <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
         <div
           className={`h-full transition-all duration-300 ${
             progress.status === 'error'
@@ -40,16 +43,6 @@ const ExportProgress: React.FC<ExportProgressProps> = ({ progress }) => {
           style={{ width: `${progress.progress}%` }}
         />
       </div>
-
-      <div className="text-center text-sm text-gray-400">
-        {progress.progress}%
-      </div>
-
-      {progress.status === 'encoding' && (
-        <div className="flex justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500" />
-        </div>
-      )}
     </div>
   );
 };
