@@ -4,7 +4,7 @@ import { useVideo } from '../context/VideoContext';
 import { useAnnotations } from '../context/AnnotationContext';
 import { useTool } from '../context/ToolContext';
 
-export const usePenDrawing = (canvasRef: React.RefObject<HTMLCanvasElement>) => {
+export const usePenDrawing = (canvasRef: React.RefObject<HTMLCanvasElement>, videoIndex: number = 0) => {
   const { videoState } = useVideo();
   const { addFreeDraw } = useAnnotations();
   const { toolSettings } = useTool();
@@ -60,6 +60,7 @@ export const usePenDrawing = (canvasRef: React.RefObject<HTMLCanvasElement>) => 
       color: toolSettings.color,
       thickness: toolSettings.penThickness,
       timestamp: Math.floor(videoState.currentTime * 1000),
+      videoIndex,
     };
 
     addFreeDraw(drawing);

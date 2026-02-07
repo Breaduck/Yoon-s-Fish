@@ -15,9 +15,9 @@ const VideoCanvas2: React.FC = () => {
   const { activeTool, toolSettings } = useTool();
   const drawingEngineRef = useRef<DrawingEngine | null>(null);
 
-  const arrowDrawing = useDrawing(canvasRef);
-  const penDrawing = usePenDrawing(canvasRef);
-  const angleMeasurement = useAngleMeasurement(canvasRef);
+  const arrowDrawing = useDrawing(canvasRef, 1);
+  const penDrawing = usePenDrawing(canvasRef, 1);
+  const angleMeasurement = useAngleMeasurement(canvasRef, 1);
 
   // Handle eraser click
   const handleEraserClick = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -127,14 +127,17 @@ const VideoCanvas2: React.FC = () => {
         drawingEngine.drawReferenceLines(annotations.referenceLines);
       }
 
-      // Draw saved annotations for current timestamp
+      // Draw saved annotations for current timestamp (only for After video - videoIndex 1)
       const currentTimestamp = Math.floor(videoState.currentTime * 1000);
       const currentAnnotations = getAnnotationsForTime(currentTimestamp);
-      drawingEngine.drawArrows(currentAnnotations.arrows);
-      drawingEngine.drawFreeDrawings(currentAnnotations.freeDrawings);
+      const afterArrows = currentAnnotations.arrows.filter(a => a.videoIndex === 1);
+      const afterDrawings = currentAnnotations.freeDrawings.filter(d => d.videoIndex === 1);
+      drawingEngine.drawArrows(afterArrows);
+      drawingEngine.drawFreeDrawings(afterDrawings);
 
-      // Draw angle measurements
-      currentAnnotations.angles.forEach((angle) => {
+      // Draw angle measurements (only for After video)
+      const afterAngles = currentAnnotations.angles.filter(a => a.videoIndex === 1);
+      afterAngles.forEach((angle) => {
         drawAngleMeasurement(
           ctx,
           angle.points[0],

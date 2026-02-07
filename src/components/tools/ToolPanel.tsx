@@ -24,7 +24,7 @@ const ToolPanel: React.FC = () => {
   };
 
   return (
-    <div className="w-72 bg-white rounded-3xl p-6 shadow-xl space-y-5">
+    <div className="w-full bg-white rounded-3xl p-4 shadow-xl space-y-4">
       <div className="flex items-center justify-between mb-2">
         <h2 className="text-xl font-bold text-gray-800">도구</h2>
         <button

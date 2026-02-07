@@ -90,15 +90,15 @@ function AppContent() {
             </header>
 
             {/* Main content */}
-            <div className="container mx-auto px-6 py-8">
-              <div className="flex gap-6">
+            <div className="container mx-auto px-4 py-6">
+              <div className="flex gap-3">
                 {/* Tool panel */}
-                <aside className="flex-shrink-0">
+                <aside className="flex-shrink-0" style={{ width: '240px' }}>
                   <ToolPanel />
                 </aside>
 
                 {/* Video area */}
-                <main className="flex-1">
+                <main className="flex-1" style={{ maxWidth: 'calc(100% - 252px)' }}>
                   <div className="space-y-5">
                     {/* Video player container */}
                     {isComparisonMode ? (

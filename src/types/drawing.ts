@@ -13,6 +13,7 @@ export interface Arrow {
   thickness: number;
   timestamp: number; // milliseconds
   style: ArrowStyle;
+  videoIndex?: number; // 0 for Before, 1 for After (optional for backward compatibility)
 }
 
 export interface FreeDraw {
@@ -21,6 +22,7 @@ export interface FreeDraw {
   color: string;
   thickness: number;
   timestamp: number; // milliseconds
+  videoIndex?: number; // 0 for Before, 1 for After (optional for backward compatibility)
 }
 
 export interface ReferenceLine {
@@ -37,6 +39,7 @@ export interface AngleMeasurement {
   angle: number;
   color: string;
   timestamp: number; // milliseconds
+  videoIndex?: number; // 0 for Before, 1 for After (optional for backward compatibility)
 }
 
 export interface AnnotationData {

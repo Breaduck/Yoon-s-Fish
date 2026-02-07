@@ -4,7 +4,7 @@ import { useAnnotations } from '../context/AnnotationContext';
 import { useVideo } from '../context/VideoContext';
 import { useTool } from '../context/ToolContext';
 
-export const useAngleMeasurement = (canvasRef: RefObject<HTMLCanvasElement>) => {
+export const useAngleMeasurement = (canvasRef: RefObject<HTMLCanvasElement>, videoIndex: number = 0) => {
   const [points, setPoints] = useState<Point[]>([]);
   const { addAngle } = useAnnotations();
   const { videoState } = useVideo();
@@ -56,6 +56,7 @@ export const useAngleMeasurement = (canvasRef: RefObject<HTMLCanvasElement>) => 
           angle,
           color: toolSettings.color,
           timestamp: Math.floor(videoState.currentTime * 1000),
+          videoIndex,
         };
         addAngle(angleMeasurement);
         setPoints([]); // Reset for next measurement

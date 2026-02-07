@@ -4,7 +4,7 @@ import { useVideo } from '../context/VideoContext';
 import { useAnnotations } from '../context/AnnotationContext';
 import { useTool } from '../context/ToolContext';
 
-export const useDrawing = (canvasRef: React.RefObject<HTMLCanvasElement>) => {
+export const useDrawing = (canvasRef: React.RefObject<HTMLCanvasElement>, videoIndex: number = 0) => {
   const { videoState } = useVideo();
   const { addArrow } = useAnnotations();
   const { toolSettings } = useTool();
@@ -70,6 +70,7 @@ export const useDrawing = (canvasRef: React.RefObject<HTMLCanvasElement>) => {
           thickness: toolSettings.thickness,
           timestamp: Math.floor(videoState.currentTime * 1000),
           style: toolSettings.arrowStyle,
+          videoIndex,
         };
         addArrow(arrow);
       }
