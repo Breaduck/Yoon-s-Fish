@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 import { AnnotationData, Arrow, FreeDraw, ReferenceLine, AngleMeasurement } from '../types/drawing';
 
 interface AnnotationContextType {
@@ -37,56 +37,56 @@ export const AnnotationProvider: React.FC<AnnotationProviderProps> = ({ children
     angles: [],
   });
 
-  const addArrow = (arrow: Arrow) => {
+  const addArrow = useCallback((arrow: Arrow) => {
     setAnnotations((prev) => ({
       ...prev,
       arrows: [...prev.arrows, arrow],
     }));
-  };
+  }, []);
 
-  const removeArrow = (id: string) => {
+  const removeArrow = useCallback((id: string) => {
     setAnnotations((prev) => ({
       ...prev,
       arrows: prev.arrows.filter((arrow) => arrow.id !== id),
     }));
-  };
+  }, []);
 
-  const addFreeDraw = (draw: FreeDraw) => {
+  const addFreeDraw = useCallback((draw: FreeDraw) => {
     setAnnotations((prev) => ({
       ...prev,
       freeDrawings: [...prev.freeDrawings, draw],
     }));
-  };
+  }, []);
 
-  const removeFreeDraw = (id: string) => {
+  const removeFreeDraw = useCallback((id: string) => {
     setAnnotations((prev) => ({
       ...prev,
       freeDrawings: prev.freeDrawings.filter((draw) => draw.id !== id),
     }));
-  };
+  }, []);
 
-  const addAngle = (angle: AngleMeasurement) => {
+  const addAngle = useCallback((angle: AngleMeasurement) => {
     setAnnotations((prev) => ({
       ...prev,
       angles: [...prev.angles, angle],
     }));
-  };
+  }, []);
 
-  const removeAngle = (id: string) => {
+  const removeAngle = useCallback((id: string) => {
     setAnnotations((prev) => ({
       ...prev,
       angles: prev.angles.filter((angle) => angle.id !== id),
     }));
-  };
+  }, []);
 
-  const setReferenceLines = (lines: ReferenceLine[]) => {
+  const setReferenceLines = useCallback((lines: ReferenceLine[]) => {
     setAnnotations((prev) => ({
       ...prev,
       referenceLines: lines,
     }));
-  };
+  }, []);
 
-  const getAnnotationsForTime = (timestamp: number) => {
+  const getAnnotationsForTime = useCallback((timestamp: number) => {
     // Return all annotations drawn before or at current timestamp
     // This makes drawings persist throughout the video
     return {
@@ -94,25 +94,25 @@ export const AnnotationProvider: React.FC<AnnotationProviderProps> = ({ children
       freeDrawings: annotations.freeDrawings.filter((draw) => draw.timestamp <= timestamp),
       angles: annotations.angles.filter((angle) => angle.timestamp <= timestamp),
     };
-  };
+  }, [annotations.arrows, annotations.freeDrawings, annotations.angles]);
 
-  const clearAnnotations = () => {
+  const clearAnnotations = useCallback(() => {
     setAnnotations({
       arrows: [],
       freeDrawings: [],
       referenceLines: [],
       angles: [],
     });
-  };
+  }, []);
 
-  const clearDrawings = () => {
+  const clearDrawings = useCallback(() => {
     setAnnotations((prev) => ({
       ...prev,
       arrows: [],
       freeDrawings: [],
       angles: [],
     }));
-  };
+  }, []);
 
   return (
     <AnnotationContext.Provider

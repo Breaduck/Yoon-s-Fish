@@ -13,12 +13,18 @@ const VideoCanvas: React.FC = () => {
   const { videoRef, videoState } = useVideo();
   const { annotations, getAnnotationsForTime, removeArrow, removeFreeDraw, removeAngle, setReferenceLines } = useAnnotations();
   const { activeTool, toolSettings, setActiveTool } = useTool();
+  const annotationsRef = useRef(annotations);
   const drawingEngineRef = useRef<DrawingEngine | null>(null);
   const [hoveredAnnotation, setHoveredAnnotation] = React.useState<{ type: 'arrow' | 'drawing' | 'angle'; id: string } | null>(null);
 
   const arrowDrawing = useDrawing(canvasRef, 0);
   const penDrawing = usePenDrawing(canvasRef, 0);
   const angleMeasurement = useAngleMeasurement(canvasRef, 0);
+
+  // Keep annotations ref updated
+  useEffect(() => {
+    annotationsRef.current = annotations;
+  }, [annotations]);
 
   // Handle waterline setup click
   const handleWaterlineClick = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -46,8 +52,8 @@ const VideoCanvas: React.FC = () => {
       thickness: 3,
     };
 
-    // Save to existing reference lines, replacing any existing waterline
-    const otherLines = annotations.referenceLines.filter(line => line.id !== 'waterline');
+    // Get current lines and add waterline (replacing any existing waterline)
+    const otherLines = annotationsRef.current.referenceLines.filter(line => line.id !== 'waterline');
     setReferenceLines([...otherLines, waterline]);
 
     // Save to localStorage
@@ -57,7 +63,7 @@ const VideoCanvas: React.FC = () => {
     setActiveTool(null);
 
     alert(`수면 위치가 설정되었습니다 (${yPercent.toFixed(1)}%)`);
-  }, [videoRef, annotations.referenceLines, setReferenceLines, setActiveTool]);
+  }, [videoRef, setReferenceLines, setActiveTool]);
 
   // Handle eraser click
   const handleEraserClick = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
