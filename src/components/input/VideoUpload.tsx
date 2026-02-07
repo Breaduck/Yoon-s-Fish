@@ -38,7 +38,12 @@ const VideoUpload: React.FC<VideoUploadProps> = ({ isSecondVideo = false }) => {
       />
       <button
         onClick={handleClick}
-        className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white rounded-xl font-semibold transition-all shadow-md"
+        className="px-5 py-2.5 text-white rounded-xl font-semibold transition-all shadow-md"
+        style={
+          isSecondVideo
+            ? { background: 'linear-gradient(to right, #2563eb, #1d4ed8)' }
+            : { background: 'linear-gradient(to right, #3b82f6, #2563eb)' }
+        }
       >
         {isComparisonMode
           ? (isSecondVideo ? 'After 영상 업로드' : 'Before 영상 업로드')

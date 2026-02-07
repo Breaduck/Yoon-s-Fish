@@ -121,7 +121,7 @@ function AppContent() {
                     onClick={() => setIsComparisonMode(!isComparisonMode)}
                     className={`px-5 py-2.5 rounded-xl font-semibold transition-all duration-200 ${
                       isComparisonMode
-                        ? 'bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-md'
+                        ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
                         : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
                     }`}
                   >
@@ -198,7 +198,7 @@ function AppContent() {
                             After
                           </div>
                           <VideoPlayer2 />
-                          <VideoCanvas2 />
+                          <VideoCanvas2 key={`canvas2-${secondVideoSource?.url || 'none'}`} />
                           {/* Empty state upload icon for After video */}
                           {!secondVideoSource && (
                             <div
