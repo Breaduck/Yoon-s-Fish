@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import { FFmpeg } from '@ffmpeg/ffmpeg';
-import { fetchFile } from '@ffmpeg/util';
+import { fetchFile, toBlobURL } from '@ffmpeg/util';
 import { useVideo } from '../../context/VideoContext';
 import { useAnnotations } from '../../context/AnnotationContext';
 import { useTool } from '../../context/ToolContext';
@@ -74,16 +74,30 @@ const ExportDialog: React.FC = () => {
     }
 
     try {
-      setProgress({ status: 'preparing', progress: 0, message: '준비 중...' });
+      setProgress({ status: 'preparing', progress: 0, message: 'FFmpeg 로딩 중...' });
 
-      // Initialize FFmpeg if needed
+      // Initialize FFmpeg with proper worker URLs
       if (!ffmpegRef.current) {
-        ffmpegRef.current = new FFmpeg();
-        await ffmpegRef.current.load();
+        const ffmpeg = new FFmpeg();
+        ffmpeg.on('log', ({ message }) => {
+          console.log(message);
+        });
+        ffmpeg.on('progress', ({ progress }) => {
+          setProgress({ status: 'encoding', progress: 90 + progress * 10, message: 'MP4 변환 중...' });
+        });
+
+        const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd';
+        await ffmpeg.load({
+          coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
+          wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
+        });
+        ffmpegRef.current = ffmpeg;
       }
 
       const mimeType = 'video/webm;codecs=vp9';
       const fileName = `aquaflux-video-${Date.now()}.mp4`;
+
+      setProgress({ status: 'preparing', progress: 5, message: '준비 중...' });
 
       const canvas = document.createElement('canvas');
       const video2 = videoRef2.current;
@@ -301,23 +315,19 @@ const ExportDialog: React.FC = () => {
         }
       };
 
-      // 녹화 완료 후 속도 복원 핸들러
+      // 녹화 완료 후 MP4 변환
       recorder.onstop = async () => {
         try {
           const webmBlob = new Blob(chunks, { type: mimeType });
-
-          // Convert WebM to MP4 using FFmpeg
-          setProgress({ status: 'encoding', progress: 90, message: 'MP4로 변환 중...' });
+          setProgress({ status: 'encoding', progress: 90, message: 'MP4 변환 중...' });
 
           const ffmpeg = ffmpegRef.current!;
           await ffmpeg.writeFile('input.webm', await fetchFile(webmBlob));
-
-          await ffmpeg.exec(['-i', 'input.webm', '-c:v', 'libx264', '-preset', 'fast', '-crf', '22', 'output.mp4']);
+          await ffmpeg.exec(['-i', 'input.webm', '-c:v', 'libx264', '-preset', 'ultrafast', 'output.mp4']);
 
           const data = await ffmpeg.readFile('output.mp4');
           const mp4Blob = new Blob([data], { type: 'video/mp4' });
 
-          // Download MP4
           const url = URL.createObjectURL(mp4Blob);
           const a = document.createElement('a');
           a.href = url;
@@ -327,11 +337,9 @@ const ExportDialog: React.FC = () => {
           document.body.removeChild(a);
           URL.revokeObjectURL(url);
 
-          // Clean up FFmpeg files
           await ffmpeg.deleteFile('input.webm');
           await ffmpeg.deleteFile('output.mp4');
 
-          // 속도 복원
           video.playbackRate = 1.0;
           video.muted = false;
           if (isComparison && video2) {
