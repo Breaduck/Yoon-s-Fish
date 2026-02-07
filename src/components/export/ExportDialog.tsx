@@ -2,13 +2,15 @@ import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import { useVideo } from '../../context/VideoContext';
 import { useAnnotations } from '../../context/AnnotationContext';
+import { useTool } from '../../context/ToolContext';
 import { DrawingEngine } from '../../services/drawingEngine';
 import ExportProgress from './ExportProgress';
 import { ExportProgress as ExportProgressType } from '../../types/export';
 
 const ExportDialog: React.FC = () => {
-  const { videoRef, videoState } = useVideo();
+  const { videoRef, videoRef2, videoState, secondVideoSource } = useVideo();
   const { annotations } = useAnnotations();
+  const { isComparisonMode } = useTool();
   const [progress, setProgress] = useState<ExportProgressType | null>(null);
 
   const handleDownload = async () => {
@@ -29,8 +31,17 @@ const ExportDialog: React.FC = () => {
       const fileName = `aquaflux-video-${Date.now()}.${fileExtension}`;
 
       const canvas = document.createElement('canvas');
-      canvas.width = 1920;
-      canvas.height = 1080;
+      const video2 = videoRef2.current;
+      const isComparison = isComparisonMode && video2 && secondVideoSource;
+
+      if (isComparison) {
+        canvas.width = 1920 * 2;
+        canvas.height = 1080;
+      } else {
+        canvas.width = 1920;
+        canvas.height = 1080;
+      }
+
       const ctx = canvas.getContext('2d');
       if (!ctx) return;
 
@@ -67,10 +78,21 @@ const ExportDialog: React.FC = () => {
       video.playbackRate = 3.0;
       video.muted = true;
 
+      if (isComparison && video2) {
+        video2.pause();
+        video2.currentTime = 0;
+        video2.playbackRate = 3.0;
+        video2.muted = true;
+      }
+
       const renderFrame = () => {
         if (video.ended) {
           video.playbackRate = 1.0;
           video.muted = false;
+          if (isComparison && video2) {
+            video2.playbackRate = 1.0;
+            video2.muted = false;
+          }
           if (mediaRecorder.state !== 'inactive') {
             mediaRecorder.stop();
           }
@@ -79,7 +101,24 @@ const ExportDialog: React.FC = () => {
 
         if (video.paused) return;
 
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        // 비교 모드: 두 영상을 side-by-side로 렌더링
+        if (isComparison && video2) {
+          ctx.drawImage(video, 0, 0, 1920, 1080);
+          ctx.drawImage(video2, 1920, 0, 1920, 1080);
+
+          // Before/After 라벨
+          ctx.save();
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+          ctx.fillRect(20, 20, 150, 60);
+          ctx.fillRect(1940, 20, 150, 60);
+          ctx.fillStyle = '#1e40af';
+          ctx.font = 'bold 32px sans-serif';
+          ctx.fillText('Before', 40, 62);
+          ctx.fillText('After', 1960, 62);
+          ctx.restore();
+        } else {
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        }
 
         const currentTime = Math.floor(video.currentTime * 1000);
 
@@ -110,11 +149,21 @@ const ExportDialog: React.FC = () => {
           if (playPromise !== undefined) {
             await playPromise;
           }
+          if (isComparison && video2) {
+            const playPromise2 = video2.play();
+            if (playPromise2 !== undefined) {
+              await playPromise2;
+            }
+          }
           requestAnimationFrame(renderFrame);
         } catch (err) {
           console.error('Play failed:', err);
           video.playbackRate = 1.0;
           video.muted = false;
+          if (isComparison && video2) {
+            video2.playbackRate = 1.0;
+            video2.muted = false;
+          }
           setProgress({ status: 'error', progress: 0, message: '재생 실패', error: String(err) });
           setTimeout(() => setProgress(null), 5000);
         }
@@ -150,9 +199,10 @@ const ExportDialog: React.FC = () => {
             position: 'fixed',
             bottom: '20px',
             right: '20px',
-            zIndex: 999999
+            zIndex: 999999,
+            width: '256px'
           }}
-          className="bg-white rounded-xl shadow-2xl p-4 w-60"
+          className="bg-white rounded-3xl shadow-xl p-4"
         >
           <ExportProgress progress={progress} />
         </div>,
