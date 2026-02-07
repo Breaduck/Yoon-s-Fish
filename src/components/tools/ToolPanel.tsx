@@ -114,9 +114,8 @@ const ToolPanel: React.FC = () => {
               ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-lg shadow-cyan-500/30'
               : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
           }`}
-          title="수면 위치를 클릭해서 설정"
         >
-          수면 설정
+          {activeTool === 'set-waterline' ? '→ 수면 클릭' : '수면 설정'}
         </button>
       </div>
 

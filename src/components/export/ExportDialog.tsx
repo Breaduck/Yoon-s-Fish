@@ -86,7 +86,7 @@ const ExportDialog: React.FC = () => {
           setProgress({ status: 'encoding', progress: 90 + progress * 10, message: 'MP4 변환 중...' });
         });
 
-        const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd';
+        const baseURL = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/umd';
         await ffmpeg.load({
           coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
           wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
@@ -232,7 +232,6 @@ const ExportDialog: React.FC = () => {
                 // Left video
                 ctx.strokeStyle = line.color;
                 ctx.lineWidth = line.thickness;
-                ctx.setLineDash([10, 5]);
                 ctx.beginPath();
                 ctx.moveTo(padding, y);
                 ctx.lineTo(padding + videoWidth, y);
@@ -246,7 +245,6 @@ const ExportDialog: React.FC = () => {
                 const x = (line.position / 100) * videoWidth;
                 ctx.strokeStyle = line.color;
                 ctx.lineWidth = line.thickness;
-                ctx.setLineDash([10, 5]);
                 // Left video
                 ctx.beginPath();
                 ctx.moveTo(padding + x, padding);
@@ -264,7 +262,6 @@ const ExportDialog: React.FC = () => {
                 const y = (line.position / 100) * canvas.height;
                 ctx.strokeStyle = line.color;
                 ctx.lineWidth = line.thickness;
-                ctx.setLineDash([10, 5]);
                 ctx.beginPath();
                 ctx.moveTo(0, y);
                 ctx.lineTo(canvas.width, y);
@@ -273,7 +270,6 @@ const ExportDialog: React.FC = () => {
                 const x = (line.position / 100) * canvas.width;
                 ctx.strokeStyle = line.color;
                 ctx.lineWidth = line.thickness;
-                ctx.setLineDash([10, 5]);
                 ctx.beginPath();
                 ctx.moveTo(x, 0);
                 ctx.lineTo(x, canvas.height);
@@ -281,7 +277,6 @@ const ExportDialog: React.FC = () => {
               }
             }
           });
-          ctx.setLineDash([]);
           ctx.restore();
         }
 

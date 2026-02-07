@@ -181,7 +181,6 @@ const VideoCanvas: React.FC = () => {
             const y = videoArea.y + (line.position / 100) * videoArea.height;
             ctx.strokeStyle = line.color;
             ctx.lineWidth = line.thickness;
-            ctx.setLineDash([10, 5]);
             ctx.beginPath();
             ctx.moveTo(videoArea.x, y);
             ctx.lineTo(videoArea.x + videoArea.width, y);
@@ -190,14 +189,12 @@ const VideoCanvas: React.FC = () => {
             const x = videoArea.x + (line.position / 100) * videoArea.width;
             ctx.strokeStyle = line.color;
             ctx.lineWidth = line.thickness;
-            ctx.setLineDash([10, 5]);
             ctx.beginPath();
             ctx.moveTo(x, videoArea.y);
             ctx.lineTo(x, videoArea.y + videoArea.height);
             ctx.stroke();
           }
         });
-        ctx.setLineDash([]);
         ctx.restore();
       }
 
