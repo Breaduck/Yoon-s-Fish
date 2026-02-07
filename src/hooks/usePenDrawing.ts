@@ -61,6 +61,7 @@ export const usePenDrawing = (canvasRef: React.RefObject<HTMLCanvasElement>, vid
       thickness: toolSettings.penThickness,
       timestamp: Math.floor(videoState.currentTime * 1000),
       videoIndex,
+      createdAt: Date.now(),
     };
 
     addFreeDraw(drawing);

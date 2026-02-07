@@ -71,6 +71,7 @@ export const useDrawing = (canvasRef: React.RefObject<HTMLCanvasElement>, videoI
           timestamp: Math.floor(videoState.currentTime * 1000),
           style: toolSettings.arrowStyle,
           videoIndex,
+          createdAt: Date.now(),
         };
         addArrow(arrow);
       }

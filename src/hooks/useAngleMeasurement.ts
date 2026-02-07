@@ -57,6 +57,7 @@ export const useAngleMeasurement = (canvasRef: RefObject<HTMLCanvasElement>, vid
           color: toolSettings.color,
           timestamp: Math.floor(videoState.currentTime * 1000),
           videoIndex,
+          createdAt: Date.now(),
         };
         addAngle(angleMeasurement);
         setPoints([]); // Reset for next measurement

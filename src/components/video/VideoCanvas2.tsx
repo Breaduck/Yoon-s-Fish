@@ -14,6 +14,7 @@ const VideoCanvas2: React.FC = () => {
   const { annotations, getAnnotationsForTime, removeArrow, removeFreeDraw, removeAngle } = useAnnotations();
   const { activeTool, toolSettings } = useTool();
   const drawingEngineRef = useRef<DrawingEngine | null>(null);
+  const [hoveredAnnotation, setHoveredAnnotation] = React.useState<{ type: 'arrow' | 'drawing' | 'angle'; id: string } | null>(null);
 
   const arrowDrawing = useDrawing(canvasRef, 1);
   const penDrawing = usePenDrawing(canvasRef, 1);

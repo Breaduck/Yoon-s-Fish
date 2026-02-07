@@ -1,6 +1,6 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { VideoProvider, useVideo } from './context/VideoContext';
-import { AnnotationProvider } from './context/AnnotationContext';
+import { AnnotationProvider, useAnnotations } from './context/AnnotationContext';
 import { ToolProvider, useTool } from './context/ToolContext';
 import VideoPlayer from './components/video/VideoPlayer';
 import VideoPlayer2 from './components/video/VideoPlayer2';
@@ -16,6 +16,7 @@ import ExportDialog from './components/export/ExportDialog';
 function AppContent() {
   const { isComparisonMode, setIsComparisonMode } = useTool();
   const { videoState, secondVideoSource, setSource, setSource2 } = useVideo();
+  const { annotations, removeArrow, removeFreeDraw, removeAngle } = useAnnotations();
 
   // Hidden file inputs for click-to-upload
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -29,6 +30,57 @@ function AppContent() {
       setSource({ type: 'file', url });
     }
   };
+
+  // Handle ESC/BACKSPACE/DELETE to remove last added annotation within 10 seconds
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' || e.key === 'Backspace' || e.key === 'Delete') {
+        const now = Date.now();
+        const tenSecondsAgo = now - 10000;
+
+        // Find the most recent annotation within 10 seconds
+        const recentArrows = annotations.arrows.filter(a => a.createdAt >= tenSecondsAgo);
+        const recentDrawings = annotations.freeDrawings.filter(d => d.createdAt >= tenSecondsAgo);
+        const recentAngles = annotations.angles.filter(a => a.createdAt >= tenSecondsAgo);
+
+        // Find the most recent one
+        let mostRecent: { type: 'arrow' | 'drawing' | 'angle'; id: string; createdAt: number } | null = null;
+
+        recentArrows.forEach(a => {
+          if (!mostRecent || a.createdAt > mostRecent.createdAt) {
+            mostRecent = { type: 'arrow', id: a.id, createdAt: a.createdAt };
+          }
+        });
+
+        recentDrawings.forEach(d => {
+          if (!mostRecent || d.createdAt > mostRecent.createdAt) {
+            mostRecent = { type: 'drawing', id: d.id, createdAt: d.createdAt };
+          }
+        });
+
+        recentAngles.forEach(a => {
+          if (!mostRecent || a.createdAt > mostRecent.createdAt) {
+            mostRecent = { type: 'angle', id: a.id, createdAt: a.createdAt };
+          }
+        });
+
+        // Remove it
+        if (mostRecent) {
+          e.preventDefault();
+          if (mostRecent.type === 'arrow') {
+            removeArrow(mostRecent.id);
+          } else if (mostRecent.type === 'drawing') {
+            removeFreeDraw(mostRecent.id);
+          } else if (mostRecent.type === 'angle') {
+            removeAngle(mostRecent.id);
+          }
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [annotations, removeArrow, removeFreeDraw, removeAngle]);
 
   return (
           <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50">
