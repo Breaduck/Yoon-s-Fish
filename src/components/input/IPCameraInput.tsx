@@ -8,8 +8,8 @@ const IPCameraInput: React.FC = () => {
   const [camera2IP, setCamera2IP] = useState('');
   const [camera1Port, setCamera1Port] = useState('80');
   const [camera2Port, setCamera2Port] = useState('80');
-  const [camera1Path, setCamera1Path] = useState('/axis-cgi/mjpg/video.cgi');
-  const [camera2Path, setCamera2Path] = useState('/axis-cgi/mjpg/video.cgi');
+  const [camera1Path, setCamera1Path] = useState('/axis-media/media.amp?videocodec=h264');
+  const [camera2Path, setCamera2Path] = useState('/axis-media/media.amp?videocodec=h264');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
@@ -155,13 +155,13 @@ const IPCameraInput: React.FC = () => {
 
             <div className="bg-yellow-50 p-4 rounded-xl mb-6">
               <p className="text-sm text-gray-700 mb-2">
-                <strong>Axis 카메라 기본 설정:</strong>
+                <strong>Axis 카메라 H.264 스트리밍:</strong>
               </p>
               <ul className="text-sm text-gray-600 space-y-1">
-                <li>• IP: 192.168.0.200 (카메라 IP 주소)</li>
+                <li>• IP: 192.168.0.200, 192.168.0.201</li>
                 <li>• 포트: 80 (기본값)</li>
-                <li>• 경로: /axis-cgi/mjpg/video.cgi</li>
-                <li>• 인증: 카메라 관리자 계정</li>
+                <li>• 경로: /axis-media/media.amp?videocodec=h264</li>
+                <li>• 대안 경로: /axis-cgi/mjpg/video.cgi (MJPEG)</li>
               </ul>
             </div>
 
