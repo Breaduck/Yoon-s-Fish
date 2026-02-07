@@ -1,3 +1,4 @@
+import React, { useRef } from 'react';
 import { VideoProvider, useVideo } from './context/VideoContext';
 import { AnnotationProvider } from './context/AnnotationContext';
 import { ToolProvider, useTool } from './context/ToolContext';
@@ -17,8 +18,8 @@ function AppContent() {
   const { videoState, secondVideoSource, setSource, setSource2 } = useVideo();
 
   // Hidden file inputs for click-to-upload
-  const fileInputRef = React.useRef<HTMLInputElement>(null);
-  const fileInput2Ref = React.useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const fileInput2Ref = useRef<HTMLInputElement>(null);
 
   const handleFileUpload = (file: File, isSecondVideo: boolean) => {
     const url = URL.createObjectURL(file);
