@@ -86,7 +86,7 @@ const ExportDialog: React.FC = () => {
       setProgress({ status: 'encoding', progress: 10, message: '녹화 중...' });
       mediaRecorder.start();
       video.currentTime = 0;
-      video.playbackRate = 2.0; // 2배속으로 빠르게 녹화
+      video.playbackRate = 4.0; // 4배속으로 빠르게 녹화 (75% 시간 단축)
 
       const renderFrame = () => {
         if (video.ended || video.paused) {
@@ -151,7 +151,17 @@ const ExportDialog: React.FC = () => {
       </button>
 
       {progress && (
-        <div style={{ position: 'fixed', bottom: '20px', right: '20px', zIndex: 9999 }} className="bg-white rounded-2xl shadow-2xl p-6 w-80">
+        <div
+          style={{
+            position: 'fixed',
+            bottom: '20px',
+            right: '20px',
+            zIndex: 99999,
+            top: 'auto',
+            left: 'auto'
+          }}
+          className="bg-white rounded-2xl shadow-2xl p-6 w-80"
+        >
           <ExportProgress progress={progress} />
         </div>
       )}

@@ -15,6 +15,7 @@ const CameraCapture: React.FC = () => {
   const [showMenu, setShowMenu] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const recordingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const recordingStartTimeRef = useRef<number>(0);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -80,18 +81,20 @@ const CameraCapture: React.FC = () => {
       recorder.onstop = () => {
         const blob = new Blob(chunks, { type: 'video/webm' });
         const url = URL.createObjectURL(blob);
+        const actualDuration = Math.round((Date.now() - recordingStartTimeRef.current) / 1000);
         addClip({
           id: `clip-${Date.now()}`,
           title: `#${clips.length + 1}`,
           blob,
           url,
-          duration: 20,
+          duration: actualDuration,
           timestamp: Date.now(),
           cameraId: selectedDevice,
         });
       };
 
       mediaRecorderRef.current = recorder;
+      recordingStartTimeRef.current = Date.now();
       recorder.start();
       setIsRecording(true);
 
