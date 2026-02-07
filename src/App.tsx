@@ -34,34 +34,26 @@ function AppContent() {
     }
   };
 
-  // Handle ESC/BACKSPACE/DELETE to remove last added annotation within 10 seconds
+  // Handle ESC/BACKSPACE/DELETE to remove last added annotation in order
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' || e.key === 'Backspace' || e.key === 'Delete') {
-        const now = Date.now();
-        const tenSecondsAgo = now - 10000;
-
-        // Find the most recent annotation within 10 seconds
-        const recentArrows = annotations.arrows.filter(a => a.createdAt >= tenSecondsAgo);
-        const recentDrawings = annotations.freeDrawings.filter(d => d.createdAt >= tenSecondsAgo);
-        const recentAngles = annotations.angles.filter(a => a.createdAt >= tenSecondsAgo);
-
-        // Find the most recent one
+        // Find the most recent annotation across all types
         let mostRecent: { type: 'arrow' | 'drawing' | 'angle'; id: string; createdAt: number } | null = null;
 
-        recentArrows.forEach(a => {
+        annotations.arrows.forEach(a => {
           if (!mostRecent || a.createdAt > mostRecent.createdAt) {
             mostRecent = { type: 'arrow', id: a.id, createdAt: a.createdAt };
           }
         });
 
-        recentDrawings.forEach(d => {
+        annotations.freeDrawings.forEach(d => {
           if (!mostRecent || d.createdAt > mostRecent.createdAt) {
             mostRecent = { type: 'drawing', id: d.id, createdAt: d.createdAt };
           }
         });
 
-        recentAngles.forEach(a => {
+        annotations.angles.forEach(a => {
           if (!mostRecent || a.createdAt > mostRecent.createdAt) {
             mostRecent = { type: 'angle', id: a.id, createdAt: a.createdAt };
           }
@@ -145,10 +137,10 @@ function AppContent() {
             </header>
 
             {/* Main content */}
-            <div className="container mx-auto px-4 py-6">
+            <div style={{ maxWidth: '98vw', margin: '0 auto', padding: '1.5rem' }}>
               <div className="flex gap-3">
                 {/* Tool panel */}
-                <aside className="flex-shrink-0" style={{ width: '200px' }}>
+                <aside className="flex-shrink-0" style={{ width: '160px' }}>
                   <ToolPanel />
                 </aside>
 

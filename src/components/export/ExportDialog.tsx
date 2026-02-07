@@ -17,24 +17,21 @@ const ExportDialog: React.FC = () => {
     exportVideo(options);
   };
 
-  if (!isOpen) {
-    return (
+  return (
+    <>
       <button
         onClick={() => setIsOpen(true)}
         className="px-5 py-2.5 bg-gradient-to-r from-purple-500 to-pink-500 hover:shadow-lg text-white rounded-xl font-semibold transition-all shadow-md shadow-purple-500/30"
       >
         영상 내보내기
       </button>
-    );
-  }
-
-  return (
-    <div
-      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center overflow-y-auto p-4"
-      style={{ zIndex: 99999, position: 'fixed' }}
-      onClick={() => setIsOpen(false)}
-    >
-      <div className="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl my-auto relative" onClick={(e) => e.stopPropagation()}>
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center overflow-y-auto p-4"
+          style={{ zIndex: 999999, position: 'fixed' }}
+          onClick={() => setIsOpen(false)}
+        >
+          <div className="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl my-auto relative" onClick={(e) => e.stopPropagation()}>
         <h2 className="text-2xl font-bold text-gray-800 mb-6">영상 내보내기</h2>
 
         {progress.status === 'idle' ? (
@@ -122,8 +119,10 @@ const ExportDialog: React.FC = () => {
             )}
           </div>
         )}
-      </div>
-    </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 
