@@ -137,15 +137,15 @@ function AppContent() {
             </header>
 
             {/* Main content */}
-            <div className="container mx-auto px-6 py-6">
-              <div className="flex gap-3">
-                {/* Tool panel */}
-                <aside className="flex-shrink-0" style={{ width: '200px' }}>
-                  <ToolPanel />
-                </aside>
+            <div className="relative">
+              {/* Tool panel - fixed to left */}
+              <aside className="fixed left-4 top-32" style={{ width: '180px', zIndex: 10 }}>
+                <ToolPanel />
+              </aside>
 
-                {/* Video area */}
-                <main className="flex-1">
+              {/* Video area - aligned with header */}
+              <div className="container mx-auto px-6 py-6">
+                <main>
                   <div className="space-y-5">
                     {/* Video player container */}
                     {isComparisonMode ? (
