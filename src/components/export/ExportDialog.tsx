@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import ReactDOM from 'react-dom';
+import { FFmpeg } from '@ffmpeg/ffmpeg';
+import { fetchFile } from '@ffmpeg/util';
 import { useVideo } from '../../context/VideoContext';
 import { useAnnotations } from '../../context/AnnotationContext';
 import { useTool } from '../../context/ToolContext';
@@ -32,6 +34,7 @@ const ExportDialog: React.FC = () => {
   const { annotations } = useAnnotations();
   const { isComparisonMode } = useTool();
   const [progress, setProgress] = useState<ExportProgressType | null>(null);
+  const ffmpegRef = useRef<FFmpeg | null>(null);
 
   const handleDownload = async () => {
     const video = videoRef.current;
@@ -43,12 +46,14 @@ const ExportDialog: React.FC = () => {
     try {
       setProgress({ status: 'preparing', progress: 0, message: '준비 중...' });
 
-      let mimeType = 'video/mp4;codecs=h264';
-      if (!MediaRecorder.isTypeSupported(mimeType)) {
-        mimeType = 'video/webm;codecs=vp9';
+      // Initialize FFmpeg if needed
+      if (!ffmpegRef.current) {
+        ffmpegRef.current = new FFmpeg();
+        await ffmpegRef.current.load();
       }
-      const fileExtension = mimeType.includes('mp4') ? 'mp4' : 'webm';
-      const fileName = `aquaflux-video-${Date.now()}.${fileExtension}`;
+
+      const mimeType = 'video/webm;codecs=vp9';
+      const fileName = `aquaflux-video-${Date.now()}.mp4`;
 
       const canvas = document.createElement('canvas');
       const video2 = videoRef2.current;
@@ -181,9 +186,11 @@ const ExportDialog: React.FC = () => {
 
         if (isComparison) {
           // 비교 모드: videoIndex에 따라 좌표 변환
-          // 새 레이아웃에서 각 비디오 크기와 위치
-          const scaleX = videoWidth / canvas.width;
-          const scaleY = videoHeight / canvas.height;
+          // 원본 비디오 해상도 대비 렌더링 크기로 스케일 계산
+          const sourceWidth = video.videoWidth || 1920;
+          const sourceHeight = video.videoHeight || 1080;
+          const scaleX = videoWidth / sourceWidth;
+          const scaleY = videoHeight / sourceHeight;
 
           // Before 비디오 주석 (좌측)
           const beforeArrows = currentArrows.filter(a => !a.videoIndex || a.videoIndex === 0).map(a => ({
@@ -264,27 +271,50 @@ const ExportDialog: React.FC = () => {
       };
 
       // 녹화 완료 후 속도 복원 핸들러
-      mediaRecorder.onstop = () => {
-        const blob = new Blob(chunks, { type: mimeType });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = fileName;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
+      mediaRecorder.onstop = async () => {
+        try {
+          const webmBlob = new Blob(chunks, { type: mimeType });
 
-        // 속도 복원
-        video.playbackRate = 1.0;
-        video.muted = false;
-        if (isComparison && video2) {
-          video2.playbackRate = 1.0;
-          video2.muted = false;
+          // Convert WebM to MP4 using FFmpeg
+          setProgress({ status: 'encoding', progress: 90, message: 'MP4로 변환 중...' });
+
+          const ffmpeg = ffmpegRef.current!;
+          await ffmpeg.writeFile('input.webm', await fetchFile(webmBlob));
+
+          await ffmpeg.exec(['-i', 'input.webm', '-c:v', 'libx264', '-preset', 'fast', '-crf', '22', 'output.mp4']);
+
+          const data = await ffmpeg.readFile('output.mp4');
+          const mp4Blob = new Blob([data], { type: 'video/mp4' });
+
+          // Download MP4
+          const url = URL.createObjectURL(mp4Blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = fileName;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+
+          // Clean up FFmpeg files
+          await ffmpeg.deleteFile('input.webm');
+          await ffmpeg.deleteFile('output.mp4');
+
+          // 속도 복원
+          video.playbackRate = 1.0;
+          video.muted = false;
+          if (isComparison && video2) {
+            video2.playbackRate = 1.0;
+            video2.muted = false;
+          }
+
+          setProgress({ status: 'complete', progress: 100, message: '다운로드 완료!' });
+          setTimeout(() => setProgress(null), 3000);
+        } catch (error) {
+          console.error('MP4 conversion error:', error);
+          setProgress({ status: 'error', progress: 0, message: 'MP4 변환 실패', error: String(error) });
+          setTimeout(() => setProgress(null), 5000);
         }
-
-        setProgress({ status: 'complete', progress: 100, message: '다운로드 완료!' });
-        setTimeout(() => setProgress(null), 3000);
       };
 
       video.load();
