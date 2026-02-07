@@ -1,4 +1,4 @@
-import { VideoProvider } from './context/VideoContext';
+import { VideoProvider, useVideo } from './context/VideoContext';
 import { AnnotationProvider } from './context/AnnotationContext';
 import { ToolProvider, useTool } from './context/ToolContext';
 import VideoPlayer from './components/video/VideoPlayer';
@@ -14,6 +14,7 @@ import ExportDialog from './components/export/ExportDialog';
 
 function AppContent() {
   const { isComparisonMode, setIsComparisonMode } = useTool();
+  const { videoState, secondVideoSource } = useVideo();
 
   return (
           <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50">
@@ -73,6 +74,17 @@ function AppContent() {
                           </div>
                           <VideoPlayer />
                           <VideoCanvas />
+                          {/* Empty state upload icon for Before video */}
+                          {!videoState.source && (
+                            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                              <div className="text-center">
+                                <svg className="w-16 h-16 mx-auto text-gray-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                </svg>
+                                <p className="text-gray-500 text-sm font-semibold">Before 영상</p>
+                              </div>
+                            </div>
+                          )}
                         </div>
 
                         {/* After Video - Right */}
@@ -82,6 +94,17 @@ function AppContent() {
                           </div>
                           <VideoPlayer2 />
                           <VideoCanvas2 />
+                          {/* Empty state upload icon for After video */}
+                          {!secondVideoSource && (
+                            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                              <div className="text-center">
+                                <svg className="w-16 h-16 mx-auto text-gray-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                </svg>
+                                <p className="text-gray-500 text-sm font-semibold">After 영상</p>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
                     ) : (
@@ -89,6 +112,17 @@ function AppContent() {
                         <div className="bg-black aspect-video relative">
                           <VideoPlayer />
                           <VideoCanvas />
+                          {/* Empty state upload icon */}
+                          {!videoState.source && (
+                            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                              <div className="text-center">
+                                <svg className="w-24 h-24 mx-auto text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                </svg>
+                                <p className="text-gray-500 font-semibold">영상을 업로드하세요</p>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
                     )}
