@@ -51,20 +51,12 @@ const ClipPanel: React.FC = () => {
           </button>
         </div>
         {selectedClips.length > 0 && (
-          <div className="flex gap-2">
-            <button
-              onClick={handleDownloadSelected}
-              className="flex-1 px-3 py-1.5 bg-blue-500 hover:bg-blue-600 text-white text-xs rounded-lg font-semibold transition-all"
-            >
-              다운로드 ({selectedClips.length})
-            </button>
-            <button
-              onClick={clearSelection}
-              className="px-3 py-1.5 bg-gray-500 hover:bg-gray-600 text-white text-xs rounded-lg font-semibold transition-all"
-            >
-              선택 해제
-            </button>
-          </div>
+          <button
+            onClick={handleDownloadSelected}
+            className="w-full px-4 py-3 bg-blue-500 hover:bg-blue-600 text-white text-sm rounded-lg font-semibold transition-all"
+          >
+            다운로드 ({selectedClips.length})
+          </button>
         )}
       </div>
 

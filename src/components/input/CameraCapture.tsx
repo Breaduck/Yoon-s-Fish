@@ -90,11 +90,12 @@ const CameraCapture: React.FC = () => {
       });
 
       const chunks: Blob[] = [];
+      const startTime = Date.now(); // Capture start time in closure
       recorder.ondataavailable = (e) => chunks.push(e.data);
       recorder.onstop = () => {
         const blob = new Blob(chunks, { type: 'video/webm' });
         const url = URL.createObjectURL(blob);
-        const actualDuration = Math.round((Date.now() - recordingStartTimeRef.current) / 1000);
+        const actualDuration = Math.round((Date.now() - startTime) / 1000); // Use captured startTime
         addClip({
           id: `clip-${Date.now()}`,
           title: `#${clips.length + 1}`,
@@ -107,7 +108,7 @@ const CameraCapture: React.FC = () => {
       };
 
       mediaRecorderRef.current = recorder;
-      recordingStartTimeRef.current = Date.now();
+      recordingStartTimeRef.current = startTime;
       recorder.start();
       setIsRecording(true);
 
