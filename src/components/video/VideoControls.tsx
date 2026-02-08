@@ -78,18 +78,13 @@ const VideoControls: React.FC<VideoControlsProps> = ({ videoIndex = 0 }) => {
   };
 
   const handlePlayPause = () => {
-    if (videoIndex === 0) {
-      if (videoState.isPlaying) {
-        pauseVideo1();
-      } else {
-        playVideo1();
-      }
+    const video = currentVideoRef.current;
+    if (!video) return;
+
+    if (video.paused) {
+      video.play();
     } else {
-      if (videoState.isPlaying) {
-        pauseVideo2();
-      } else {
-        playVideo2();
-      }
+      video.pause();
     }
   };
 
@@ -106,10 +101,10 @@ const VideoControls: React.FC<VideoControlsProps> = ({ videoIndex = 0 }) => {
   };
 
   const formatTime = (seconds: number) => {
-    if (!isFinite(seconds)) return '0:00.00';
+    if (!isFinite(seconds)) return '0:00.000';
     const mins = Math.floor(seconds / 60);
-    const secs = (seconds % 60).toFixed(2);
-    return `${mins}:${secs.padStart(5, '0')}`;
+    const secs = (seconds % 60).toFixed(3);
+    return `${mins}:${secs.padStart(6, '0')}`;
   };
 
   if (!videoState.source) return null;
@@ -161,7 +156,7 @@ const VideoControls: React.FC<VideoControlsProps> = ({ videoIndex = 0 }) => {
           onClick={handlePlayPause}
           className="w-10 h-10 bg-white/90 hover:bg-white backdrop-blur-sm rounded-full text-gray-800 font-semibold flex items-center justify-center transition-all shadow-lg"
         >
-          {videoState.isPlaying ? '⏸' : '▶'}
+          {currentVideoRef.current?.paused !== false ? '▶' : '⏸'}
         </button>
 
         {/* Right controls */}

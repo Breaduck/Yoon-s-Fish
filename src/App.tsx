@@ -84,12 +84,15 @@ function AppContent() {
           }
         }
       } else if (e.key === ' ') {
-        // Toggle play/pause with spacebar (triggers same as play button)
+        // Toggle play/pause with spacebar
         e.preventDefault();
-        if (videoState.isPlaying) {
-          pause();
-        } else {
-          play();
+        const video = videoRef.current;
+        if (video) {
+          if (video.paused) {
+            video.play();
+          } else {
+            video.pause();
+          }
         }
       } else if (e.key === 'ArrowRight') {
         // Seek forward 1 frame (~0.033s at 30fps)
