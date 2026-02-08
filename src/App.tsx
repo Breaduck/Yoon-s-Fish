@@ -179,8 +179,9 @@ function AppContent() {
                   <div className="space-y-5 w-full">
                     {/* Video player container */}
                     {isComparisonMode ? (
+                      <div className="bg-white rounded-3xl overflow-hidden shadow-xl" style={{ height: 'calc(100vh - 180px)' }}>
                       <div
-                        className="bg-white rounded-3xl overflow-hidden aspect-video relative flex gap-3 p-3 shadow-xl"
+                        className="relative flex gap-3 p-3 h-full"
                         onDragOver={(e) => e.preventDefault()}
                         onDrop={(e) => {
                           e.preventDefault();
@@ -198,6 +199,7 @@ function AppContent() {
                         }}
                       >
                         {/* Before Video - Left */}
+                        <div className="flex-1 flex flex-col">
                         <div
                           className="flex-1 relative bg-black rounded-2xl overflow-hidden"
                           onMouseEnter={() => setShowControlsVideo1(true)}
@@ -248,7 +250,10 @@ function AppContent() {
                         {/* Frame scrubber */}
                         <FrameScrubber videoIndex={0} />
 
+                        </div>
+
                         {/* After Video - Right */}
+                        <div className="flex-1 flex flex-col">
                         <div
                           className="flex-1 relative bg-black rounded-2xl overflow-hidden"
                           onMouseEnter={() => setShowControlsVideo2(true)}
@@ -298,11 +303,14 @@ function AppContent() {
                         </div>
                         {/* Frame scrubber */}
                         <FrameScrubber videoIndex={1} />
+                        </div>
+                      </div>
                       </div>
                     ) : (
-                      <div className="bg-white rounded-3xl overflow-hidden shadow-xl">
+                      <div className="bg-white rounded-3xl overflow-hidden shadow-xl" style={{ height: 'calc(100vh - 180px)' }}>
+                        <div className="h-full flex flex-col">
                         <div
-                          className="bg-black aspect-video relative"
+                          className="flex-1 bg-black relative"
                           onMouseEnter={() => setShowControls(true)}
                           onMouseLeave={() => setShowControls(false)}
                           onDragOver={(e) => e.preventDefault()}
@@ -362,6 +370,7 @@ function AppContent() {
                         </div>
                         {/* Frame scrubber */}
                         <FrameScrubber videoIndex={0} />
+                        </div>
                       </div>
                     )}
 

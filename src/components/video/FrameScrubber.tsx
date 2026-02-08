@@ -59,10 +59,10 @@ const FrameScrubber: React.FC<FrameScrubberProps> = ({ videoIndex = 0 }) => {
   const playheadPosition = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   return (
-    <div className="w-full px-4 py-2 bg-gray-900">
+    <div className="w-full px-2 py-1 bg-gray-900">
       <div
         ref={scrubberRef}
-        className="relative w-full h-8 bg-gray-800 rounded cursor-pointer"
+        className="relative w-full h-6 bg-gray-800 rounded cursor-pointer"
         onMouseDown={handleMouseDown}
       >
         {/* Ruler marks */}
