@@ -109,7 +109,7 @@ function AppContent() {
 
             {/* Header */}
             <header className="bg-white/80 backdrop-blur-lg border-b border-gray-200 shadow-sm relative overflow-visible" style={{ zIndex: 100000 }}>
-              <div className="container mx-auto px-6 py-6 flex items-center justify-between min-h-[80px]">
+              <div className="px-6 py-6 flex items-center justify-between min-h-[80px]">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-2xl flex items-center justify-center" style={{ backgroundColor: '#083985' }}>
                     <span className="text-white font-bold text-xl">A</span>
