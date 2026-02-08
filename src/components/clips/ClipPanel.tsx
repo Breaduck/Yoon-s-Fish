@@ -39,15 +39,15 @@ const ClipPanel: React.FC = () => {
   };
 
   return (
-    <div className="w-full h-full bg-white rounded-l-3xl rounded-r-none p-4 shadow-xl">
-      <div className="mb-4">
+    <div className="w-full h-full bg-white rounded-2xl lg:rounded-l-3xl lg:rounded-r-none p-3 sm:p-4 shadow-xl">
+      <div className="mb-3 sm:mb-4">
         <div className="flex items-center justify-between mb-2">
-          <h2 className="text-xl font-bold text-gray-800">클립</h2>
+          <h2 className="text-lg sm:text-xl font-bold text-gray-800">클립</h2>
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm rounded-xl font-semibold transition-all"
+            className="px-2 sm:px-3 py-1.5 sm:py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs sm:text-sm rounded-lg sm:rounded-xl font-semibold transition-all"
           >
-            {isCollapsed ? '›' : '‹'}
+            {isCollapsed ? '▼' : '▲'}
           </button>
         </div>
         {selectedClips.length > 0 && (

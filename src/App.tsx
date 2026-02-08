@@ -142,25 +142,25 @@ function AppContent() {
 
             {/* Header */}
             <header className="bg-white/80 backdrop-blur-lg border-b border-gray-200 shadow-sm relative overflow-visible" style={{ zIndex: 100000 }}>
-              <div className="px-0 py-6 flex items-center justify-between min-h-[80px]">
-                <div className="flex items-center gap-3 ml-3">
-                  <div className="w-10 h-10 rounded-2xl flex items-center justify-center" style={{ backgroundColor: '#083985' }}>
-                    <span className="text-white font-bold text-xl">A</span>
+              <div className="px-2 sm:px-4 py-3 sm:py-6 flex items-center justify-between min-h-[60px] sm:min-h-[80px]">
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl flex items-center justify-center" style={{ backgroundColor: '#083985' }}>
+                    <span className="text-white font-bold text-lg sm:text-xl">A</span>
                   </div>
-                  <h1 className="text-2xl font-bold" style={{ color: '#083985' }}>
+                  <h1 className="text-lg sm:text-2xl font-bold" style={{ color: '#083985' }}>
                     AQUAFLUX
                   </h1>
                 </div>
-                <div className="flex gap-3 mr-3">
+                <div className="flex gap-1 sm:gap-3 flex-wrap justify-end">
                   <button
                     onClick={() => setIsComparisonMode(!isComparisonMode)}
-                    className={`px-5 py-2.5 rounded-xl font-semibold transition-all duration-200 ${
+                    className={`px-3 sm:px-5 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-base font-semibold transition-all duration-200 ${
                       isComparisonMode
                         ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
                         : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
                     }`}
                   >
-                    {isComparisonMode ? '비교 모드' : '비교 모드'}
+                    비교
                   </button>
                   {!isComparisonMode && <VideoUpload />}
                   {isComparisonMode && (
@@ -177,14 +177,14 @@ function AppContent() {
             </header>
 
             {/* Main content */}
-            <div className="flex gap-3 pl-0 pr-0 py-1 w-full max-w-none">
-              {/* Tool panel - left */}
-              <aside className="ml-3" style={{ width: '135px', flexShrink: 0 }}>
+            <div className="flex flex-col lg:flex-row gap-2 sm:gap-3 px-2 sm:px-0 sm:pl-0 sm:pr-0 py-1 w-full max-w-none">
+              {/* Tool panel - left on desktop, top on mobile */}
+              <aside className="w-full lg:w-[135px] lg:ml-3 flex-shrink-0 order-2 lg:order-1">
                 <ToolPanel />
               </aside>
 
               {/* Video area - center, flexible */}
-              <main className="flex-1 w-full" style={{ minWidth: 0 }}>
+              <main className="flex-1 w-full order-1 lg:order-2" style={{ minWidth: 0 }}>
                   <div className="space-y-5 w-full">
                     {/* Video player container */}
                     {isComparisonMode ? (
@@ -378,8 +378,8 @@ function AppContent() {
                   </div>
                 </main>
 
-              {/* Clip panel - right */}
-              <aside style={{ width: '185px', flexShrink: 0 }}>
+              {/* Clip panel - right on desktop, bottom on mobile */}
+              <aside className="w-full lg:w-[185px] flex-shrink-0 order-3">
                 <ClipPanel />
               </aside>
             </div>
