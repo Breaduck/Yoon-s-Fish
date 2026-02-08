@@ -68,7 +68,7 @@ export const ToolProvider: React.FC<ToolProviderProps> = ({ children }) => {
     showHorizontalLines: true,
     showVerticalLines: false,
     arrowStyle: 'solid',
-    penThickness: 3,
+    penThickness: 5,
     waterlinePosition: loadWaterline(),
     showWaterline: true,
   });
@@ -87,7 +87,7 @@ export const ToolProvider: React.FC<ToolProviderProps> = ({ children }) => {
       showHorizontalLines: true,
       showVerticalLines: false,
       arrowStyle: 'solid',
-      penThickness: 3,
+      penThickness: 5,
       waterlinePosition: loadWaterline(),
       showWaterline: true,
     });

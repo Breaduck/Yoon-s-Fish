@@ -203,21 +203,11 @@ const ReferenceLines: React.FC = () => {
         </div>
       )}
 
-      {/* Waterline Section - Default 38% with manual selection */}
+      {/* Waterline Section */}
       <div className="pt-3 border-t border-gray-200">
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <label className="text-sm font-semibold text-gray-700">수면 기준선</label>
-            <button
-              onClick={() => setIsSettingWaterline(true)}
-              className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${
-                isSettingWaterline
-                  ? 'bg-cyan-500 text-white'
-                  : 'bg-cyan-100 hover:bg-cyan-200 text-cyan-700'
-              }`}
-            >
-              {isSettingWaterline ? '→ 영상 클릭' : '위치 선택'}
-            </button>
           </div>
 
           <div className="bg-blue-50 p-3 rounded-xl space-y-3">

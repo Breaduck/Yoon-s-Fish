@@ -19,7 +19,7 @@ import ExportDialog from './components/export/ExportDialog';
 
 function AppContent() {
   const { isComparisonMode, setIsComparisonMode } = useTool();
-  const { videoState, secondVideoSource, setSource, setSource2, clearSource, clearSource2, play, pause, playVideo1, pauseVideo1, playVideo2, pauseVideo2, playBoth } = useVideo();
+  const { videoState, secondVideoSource, setSource, setSource2, clearSource, clearSource2, play, pause, seek, playVideo1, pauseVideo1, playVideo2, pauseVideo2, playBoth } = useVideo();
   const { annotations, removeArrow, removeFreeDraw, removeAngle } = useAnnotations();
 
   // Hidden file inputs for click-to-upload
@@ -90,15 +90,23 @@ function AppContent() {
         } else {
           play();
         }
+      } else if (e.key === 'ArrowRight') {
+        // Seek forward 1 frame (~0.033s at 30fps)
+        e.preventDefault();
+        seek(Math.min(videoState.duration, videoState.currentTime + 0.033));
+      } else if (e.key === 'ArrowLeft') {
+        // Seek backward 1 frame (~0.033s at 30fps)
+        e.preventDefault();
+        seek(Math.max(0, videoState.currentTime - 0.033));
       }
     };
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [annotations, removeArrow, removeFreeDraw, removeAngle, videoState.isPlaying, play, pause]);
+  }, [annotations, removeArrow, removeFreeDraw, removeAngle, videoState.isPlaying, videoState.currentTime, videoState.duration, play, pause, seek]);
 
   return (
-          <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50 w-full max-w-none">
+          <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50 w-full max-w-none overflow-x-hidden">
             {/* Hidden file inputs for click-to-upload */}
             <input
               ref={fileInputRef}
@@ -158,9 +166,9 @@ function AppContent() {
             </header>
 
             {/* Main content */}
-            <div className="flex gap-3 pl-3 pr-0 py-4 w-full max-w-none">
+            <div className="flex flex-col lg:flex-row gap-3 pl-3 pr-0 py-4 w-full max-w-none">
               {/* Tool panel - left */}
-              <aside style={{ width: '135px', flexShrink: 0 }}>
+              <aside className="w-full lg:w-auto" style={{ flexShrink: 0 }}>
                 <ToolPanel />
               </aside>
 
@@ -177,7 +185,7 @@ function AppContent() {
                           onMouseLeave={() => setShowControlsVideo1(false)}
                         >
                           <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-xl text-sm font-bold text-gray-800 z-10 shadow-lg">
-                            Before
+                            {videoState.source?.type === 'camera' ? '카메라 1' : 'Before'}
                           </div>
                           {/* X button to clear video */}
                           {videoState.source && (
@@ -226,7 +234,7 @@ function AppContent() {
                           onMouseLeave={() => setShowControlsVideo2(false)}
                         >
                           <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-xl text-sm font-bold text-gray-800 z-10 shadow-lg">
-                            After
+                            {secondVideoSource?.type === 'camera' ? '카메라 2' : 'After'}
                           </div>
                           {/* X button to clear video */}
                           {secondVideoSource && (
@@ -321,7 +329,7 @@ function AppContent() {
                 </main>
 
               {/* Clip panel - right */}
-              <aside style={{ width: '264px', flexShrink: 0 }}>
+              <aside className="w-full lg:w-auto" style={{ flexShrink: 0 }}>
                 <ClipPanel />
               </aside>
             </div>
