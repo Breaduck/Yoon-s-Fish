@@ -7,7 +7,7 @@ import { CameraService } from '../../services/cameraService';
 const cameraService = new CameraService();
 
 const CameraCapture: React.FC = () => {
-  const { videoRef, setSource } = useVideo();
+  const { videoRef, setSource, play } = useVideo();
   const { addClip, clips } = useClips();
   const [isActive, setIsActive] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
@@ -61,8 +61,9 @@ const CameraCapture: React.FC = () => {
       setIsActive(true);
       setShowMenu(false);
 
-      // 자동으로 녹화 시작
+      // 자동으로 재생 및 녹화 시작
       setTimeout(() => {
+        play();
         startRecording();
       }, 500);
     } catch (error) {
@@ -78,7 +79,7 @@ const CameraCapture: React.FC = () => {
     cameraService.stopCamera();
     setSource({ type: 'file', url: undefined });
     setIsActive(false);
-    clipCounterRef.current = 0; // Reset counter when camera stops
+    // Keep counter to continue numbering across sessions
   };
 
   const startRecording = async () => {
