@@ -19,7 +19,7 @@ import ExportDialog from './components/export/ExportDialog';
 
 function AppContent() {
   const { isComparisonMode, setIsComparisonMode } = useTool();
-  const { videoState, secondVideoSource, setSource, setSource2, clearSource, clearSource2, play, pause, seek, videoRef, playVideo1, pauseVideo1, playVideo2, pauseVideo2, playBoth } = useVideo();
+  const { videoState, secondVideoSource, setSource, setSource2, clearSource, clearSource2, play, pause, seek, videoRef, videoRef2, playVideo1, pauseVideo1, playVideo2, pauseVideo2, playBoth } = useVideo();
   const { annotations, removeArrow, removeFreeDraw, removeAngle } = useAnnotations();
   const { clips } = useClips();
 
@@ -31,6 +31,7 @@ function AppContent() {
   const [showControls, setShowControls] = React.useState(true);
   const [showControlsVideo1, setShowControlsVideo1] = React.useState(false);
   const [showControlsVideo2, setShowControlsVideo2] = React.useState(false);
+  const [lastFocusedVideo, setLastFocusedVideo] = React.useState<number>(0); // 0 for video1, 1 for video2
 
   const handleFileUpload = (file: File, isSecondVideo: boolean) => {
     const url = URL.createObjectURL(file);
@@ -84,9 +85,9 @@ function AppContent() {
           }
         }
       } else if (e.key === ' ') {
-        // Toggle play/pause with spacebar
+        // Toggle play/pause with spacebar (last focused video in comparison mode)
         e.preventDefault();
-        const video = videoRef.current;
+        const video = isComparisonMode && lastFocusedVideo === 1 ? videoRef2.current : videoRef.current;
         if (video) {
           if (video.paused) {
             video.play();
@@ -95,19 +96,25 @@ function AppContent() {
           }
         }
       } else if (e.key === 'ArrowRight') {
-        // Seek forward 1 frame (~0.033s at 30fps)
+        // Seek forward 1 frame on last focused video
         e.preventDefault();
-        seek(Math.min(videoState.duration, videoState.currentTime + 0.033));
+        const video = isComparisonMode && lastFocusedVideo === 1 ? videoRef2.current : videoRef.current;
+        if (video) {
+          video.currentTime = Math.min(video.duration || 0, video.currentTime + 0.033);
+        }
       } else if (e.key === 'ArrowLeft') {
-        // Seek backward 1 frame (~0.033s at 30fps)
+        // Seek backward 1 frame on last focused video
         e.preventDefault();
-        seek(Math.max(0, videoState.currentTime - 0.033));
+        const video = isComparisonMode && lastFocusedVideo === 1 ? videoRef2.current : videoRef.current;
+        if (video) {
+          video.currentTime = Math.max(0, video.currentTime - 0.033);
+        }
       }
     };
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [annotations, removeArrow, removeFreeDraw, removeAngle, videoState.isPlaying, videoState.currentTime, videoState.duration, play, pause, seek]);
+  }, [annotations, removeArrow, removeFreeDraw, removeAngle, isComparisonMode, lastFocusedVideo, videoRef, videoRef2]);
 
   return (
           <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50 w-screen max-w-none overflow-x-hidden m-0 p-0">
@@ -204,7 +211,7 @@ function AppContent() {
                         <div className="flex-1 flex flex-col">
                         <div
                           className="flex-1 relative bg-black rounded-2xl overflow-hidden"
-                          onMouseEnter={() => setShowControlsVideo1(true)}
+                          onMouseEnter={() => { setShowControlsVideo1(true); setLastFocusedVideo(0); }}
                           onMouseLeave={() => setShowControlsVideo1(false)}
                         >
                           <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-xl text-sm font-bold text-gray-800 z-10 shadow-lg">
@@ -256,7 +263,7 @@ function AppContent() {
                         <div className="flex-1 flex flex-col" style={{ position: 'relative', zIndex: 1 }}>
                         <div
                           className="flex-1 relative bg-black rounded-2xl overflow-hidden"
-                          onMouseEnter={() => setShowControlsVideo2(true)}
+                          onMouseEnter={() => { setShowControlsVideo2(true); setLastFocusedVideo(1); }}
                           onMouseLeave={() => setShowControlsVideo2(false)}
                         >
                           <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-xl text-sm font-bold text-gray-800 z-10 shadow-lg">

@@ -49,12 +49,8 @@ const VideoControls: React.FC<VideoControlsProps> = ({ videoIndex = 0 }) => {
   const handleProgressChange = (value: number) => {
     if (!currentVideoRef.current || !duration) return;
 
-    // Snap to frame
-    const frameTime = 1 / fps;
-    const frameNumber = Math.round(value / frameTime);
-    const snappedTime = frameNumber * frameTime;
-
-    currentVideoRef.current.currentTime = Math.max(0, Math.min(duration, snappedTime));
+    // Smooth seeking without frame snap during drag for better control
+    currentVideoRef.current.currentTime = Math.max(0, Math.min(duration, value));
   };
 
   // Close menu when clicking outside
@@ -121,13 +117,14 @@ const VideoControls: React.FC<VideoControlsProps> = ({ videoIndex = 0 }) => {
           type="range"
           min="0"
           max={duration || 100}
-          step="0.001"
+          step="any"
           value={currentTime}
           onMouseDown={() => setIsDragging(true)}
           onMouseUp={() => setIsDragging(false)}
           onTouchStart={() => setIsDragging(true)}
           onTouchEnd={() => setIsDragging(false)}
           onChange={(e) => handleProgressChange(parseFloat(e.target.value))}
+          onInput={(e) => handleProgressChange(parseFloat((e.target as HTMLInputElement).value))}
           className="flex-1 h-2 bg-white/30 rounded-full appearance-none cursor-pointer accent-blue-500"
           style={{
             backgroundImage: `linear-gradient(to right, rgb(59, 130, 246) 0%, rgb(59, 130, 246) ${duration > 0 ? (currentTime / duration) * 100 : 0}%, rgba(255,255,255,0.3) ${duration > 0 ? (currentTime / duration) * 100 : 0}%, rgba(255,255,255,0.3) 100%)`
