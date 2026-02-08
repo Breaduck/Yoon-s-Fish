@@ -5,8 +5,12 @@ import { PlaybackRate } from '../../types/video';
 
 const PLAYBACK_RATES: PlaybackRate[] = [0.25, 0.5, 0.75, 1, 1.5, 2];
 
-const VideoControls: React.FC = () => {
-  const { videoState, play, pause, setPlaybackRate, seek } = useVideo();
+interface VideoControlsProps {
+  videoIndex?: number; // 0 for video1, 1 for video2
+}
+
+const VideoControls: React.FC<VideoControlsProps> = ({ videoIndex = 0 }) => {
+  const { videoState, play, pause, playVideo1, pauseVideo1, playVideo2, pauseVideo2, setPlaybackRate, seek } = useVideo();
   const { setIsFullscreen } = useTool();
   const [showSpeedMenu, setShowSpeedMenu] = useState(false);
   const [customSpeed, setCustomSpeed] = useState('');
@@ -33,10 +37,18 @@ const VideoControls: React.FC = () => {
   };
 
   const handlePlayPause = () => {
-    if (videoState.isPlaying) {
-      pause();
+    if (videoIndex === 0) {
+      if (videoState.isPlaying) {
+        pauseVideo1();
+      } else {
+        playVideo1();
+      }
     } else {
-      play();
+      if (videoState.isPlaying) {
+        pauseVideo2();
+      } else {
+        playVideo2();
+      }
     }
   };
 

@@ -8,6 +8,7 @@ import VideoPlayer2 from './components/video/VideoPlayer2';
 import VideoCanvas from './components/video/VideoCanvas';
 import VideoCanvas2 from './components/video/VideoCanvas2';
 import VideoControls from './components/video/VideoControls';
+import FrameScrubber from './components/video/FrameScrubber';
 import FullscreenPlayer from './components/video/FullscreenPlayer';
 import ToolPanel from './components/tools/ToolPanel';
 import ClipPanel from './components/clips/ClipPanel';
@@ -241,9 +242,11 @@ function AppContent() {
                               showControlsVideo1 ? 'opacity-100' : 'opacity-0'
                             }`}
                           >
-                            <VideoControls />
+                            <VideoControls videoIndex={0} />
                           </div>
                         </div>
+                        {/* Frame scrubber */}
+                        <FrameScrubber videoIndex={0} />
 
                         {/* After Video - Right */}
                         <div
@@ -290,9 +293,11 @@ function AppContent() {
                               showControlsVideo2 ? 'opacity-100' : 'opacity-0'
                             }`}
                           >
-                            <VideoControls />
+                            <VideoControls videoIndex={1} />
                           </div>
                         </div>
+                        {/* Frame scrubber */}
+                        <FrameScrubber videoIndex={1} />
                       </div>
                     ) : (
                       <div className="bg-white rounded-3xl overflow-hidden shadow-xl">
@@ -352,9 +357,11 @@ function AppContent() {
                               showControls ? 'opacity-100' : 'opacity-0'
                             }`}
                           >
-                            <VideoControls />
+                            <VideoControls videoIndex={0} />
                           </div>
                         </div>
+                        {/* Frame scrubber */}
+                        <FrameScrubber videoIndex={0} />
                       </div>
                     )}
 
