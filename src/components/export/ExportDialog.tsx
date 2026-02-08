@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import { FFmpeg } from '@ffmpeg/ffmpeg';
-import { fetchFile, toBlobURL } from '@ffmpeg/util';
+import { fetchFile } from '@ffmpeg/util';
 import { useVideo } from '../../context/VideoContext';
 import { useAnnotations } from '../../context/AnnotationContext';
 import { useTool } from '../../context/ToolContext';
@@ -86,10 +86,10 @@ const ExportDialog: React.FC = () => {
           setProgress({ status: 'encoding', progress: 90 + progress * 10, message: 'MP4 변환 중...' });
         });
 
-        const baseURL = window.location.origin + '/ffmpeg';
+        const baseURL = '/ffmpeg';
         await ffmpeg.load({
-          coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
-          wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
+          coreURL: `${baseURL}/ffmpeg-core.js`,
+          wasmURL: `${baseURL}/ffmpeg-core.wasm`,
         });
         ffmpegRef.current = ffmpeg;
       }
