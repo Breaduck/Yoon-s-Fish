@@ -44,7 +44,7 @@ const VideoControls: React.FC<VideoControlsProps> = ({ videoIndex = 0 }) => {
       video.removeEventListener('loadedmetadata', updateTime);
       video.removeEventListener('durationchange', updateTime);
     };
-  }, [currentVideoRef, isDragging]);
+  }, [videoIndex, videoRef, videoRef2, currentVideoRef, isDragging]);
 
   const handleProgressChange = (value: number) => {
     if (!currentVideoRef.current || !duration) return;
