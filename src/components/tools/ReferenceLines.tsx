@@ -10,6 +10,7 @@ const ReferenceLines: React.FC = () => {
   const { setReferenceLines } = useAnnotations();
   const { videoRef } = useVideo();
   const [isSettingWaterline, setIsSettingWaterline] = useState(false);
+  const [isWaterlineExpanded, setIsWaterlineExpanded] = useState(false);
 
   useEffect(() => {
     const lines: ReferenceLine[] = [];
@@ -203,45 +204,6 @@ const ReferenceLines: React.FC = () => {
         </div>
       )}
 
-      {/* Waterline Section */}
-      <div className="pt-3 border-t border-gray-200">
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <label className="text-sm font-semibold text-gray-700">수면 기준선</label>
-          </div>
-
-          <div className="bg-blue-50 p-3 rounded-xl space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-700">
-                위치: <span className="font-bold text-blue-600">{(toolSettings.waterlinePosition || 34.7).toFixed(1)}%</span>
-              </span>
-              <span className="text-xs text-gray-500">중심 기준선</span>
-            </div>
-
-            {/* Fine adjustment controls */}
-            <div className="flex items-center justify-between gap-2">
-              <span className="text-xs text-gray-600">미세 조정 (0.1%)</span>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => adjustWaterline(-0.1)}
-                  className="w-8 h-8 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg font-bold transition-all"
-                  title="아래로"
-                >
-                  ↓
-                </button>
-                <button
-                  onClick={() => adjustWaterline(0.1)}
-                  className="w-8 h-8 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg font-bold transition-all"
-                  title="위로"
-                >
-                  ↑
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <div>
         <label className="block text-sm font-semibold text-gray-700 mb-3">색상</label>
         <div className="grid grid-cols-4 gap-2 mb-3">
@@ -267,6 +229,53 @@ const ReferenceLines: React.FC = () => {
             className="w-10 h-10 rounded-lg cursor-pointer border-2 border-gray-300"
           />
           <span className="text-xs font-mono text-gray-600">{toolSettings.color}</span>
+        </div>
+      </div>
+
+      {/* Waterline Section - Moved to bottom */}
+      <div className="pt-3 border-t border-gray-200">
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <label className="text-sm font-semibold text-gray-700">수면 기준선</label>
+            <button
+              onClick={() => setIsWaterlineExpanded(!isWaterlineExpanded)}
+              className="px-2 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs rounded-lg font-semibold transition-all"
+            >
+              {isWaterlineExpanded ? '▲' : '▼'}
+            </button>
+          </div>
+
+          {isWaterlineExpanded && (
+            <div className="bg-blue-50 p-3 rounded-xl space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-700">
+                  위치: <span className="font-bold text-blue-600">{(toolSettings.waterlinePosition || 34.7).toFixed(1)}%</span>
+                </span>
+                <span className="text-xs text-gray-500">중심 기준선</span>
+              </div>
+
+              {/* Fine adjustment controls */}
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-xs text-gray-600">미세 조정 (0.1%)</span>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => adjustWaterline(-0.1)}
+                    className="w-8 h-8 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg font-bold transition-all"
+                    title="아래로"
+                  >
+                    ↓
+                  </button>
+                  <button
+                    onClick={() => adjustWaterline(0.1)}
+                    className="w-8 h-8 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg font-bold transition-all"
+                    title="위로"
+                  >
+                    ↑
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
