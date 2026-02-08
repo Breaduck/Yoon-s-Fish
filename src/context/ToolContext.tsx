@@ -51,11 +51,11 @@ export const ToolProvider: React.FC<ToolProviderProps> = ({ children }) => {
   const [isComparisonMode, setIsComparisonMode] = useState(false);
   const [isToolPanelCollapsed, setIsToolPanelCollapsed] = useState(false);
 
-  // Fixed waterline position at 34%
-  const WATERLINE_Y = 34;
+  // Fixed waterline position at 38%
+  const WATERLINE_Y = 38;
 
   const loadWaterline = () => {
-    // Always start with 34%, ignore localStorage
+    // Always start with 38%, ignore localStorage
     return WATERLINE_Y;
   };
 

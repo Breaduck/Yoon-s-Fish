@@ -14,21 +14,50 @@ const ReferenceLines: React.FC = () => {
   useEffect(() => {
     const lines: ReferenceLine[] = [];
 
-    // Generate horizontal lines centered around waterline (34% default)
+    // Generate horizontal lines with waterline as center
     if (toolSettings.showHorizontalLines && toolSettings.lineCount > 0) {
-      const waterlinePos = toolSettings.waterlinePosition || 34;
-      const step = 100 / (toolSettings.lineCount + 1);
+      const waterlinePos = toolSettings.waterlinePosition || 38;
 
-      for (let i = 1; i <= toolSettings.lineCount; i++) {
-        const offset = (i - (toolSettings.lineCount + 1) / 2) * step;
-        const position = waterlinePos + offset;
+      // Always include waterline as one of the lines
+      lines.push({
+        id: 'waterline',
+        type: 'horizontal',
+        position: waterlinePos,
+        color: toolSettings.color,
+        thickness: toolSettings.lineThickness,
+      });
 
-        // Only add lines that are within bounds (0-100%)
-        if (position > 0 && position < 100) {
+      // Calculate remaining lines to distribute above and below waterline
+      const remainingLines = toolSettings.lineCount - 1;
+      if (remainingLines > 0) {
+        const linesAbove = Math.floor(remainingLines / 2);
+        const linesBelow = Math.ceil(remainingLines / 2);
+
+        // Space above waterline: 0 to waterlinePos
+        const spaceAbove = waterlinePos;
+        const stepAbove = spaceAbove / (linesAbove + 1);
+
+        // Space below waterline: waterlinePos to 100
+        const spaceBelow = 100 - waterlinePos;
+        const stepBelow = spaceBelow / (linesBelow + 1);
+
+        // Add lines above waterline
+        for (let i = 1; i <= linesAbove; i++) {
           lines.push({
-            id: `h-line-${i}`,
+            id: `h-line-above-${i}`,
             type: 'horizontal',
-            position: position,
+            position: stepAbove * i,
+            color: toolSettings.color,
+            thickness: toolSettings.lineThickness,
+          });
+        }
+
+        // Add lines below waterline
+        for (let i = 1; i <= linesBelow; i++) {
+          lines.push({
+            id: `h-line-below-${i}`,
+            type: 'horizontal',
+            position: waterlinePos + stepBelow * i,
             color: toolSettings.color,
             thickness: toolSettings.lineThickness,
           });
@@ -178,11 +207,11 @@ const ReferenceLines: React.FC = () => {
         </div>
       )}
 
-      {/* Waterline Section - Default 34% with manual selection */}
+      {/* Waterline Section - Default 38% with manual selection */}
       <div className="pt-3 border-t border-gray-200">
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <label className="text-sm font-semibold text-gray-700">수면 중심점</label>
+            <label className="text-sm font-semibold text-gray-700">수면 기준선</label>
             <button
               onClick={() => setIsSettingWaterline(true)}
               className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${
@@ -198,9 +227,9 @@ const ReferenceLines: React.FC = () => {
           <div className="bg-blue-50 p-3 rounded-xl space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-700">
-                중심: <span className="font-bold text-blue-600">{(toolSettings.waterlinePosition || 34).toFixed(1)}%</span>
+                위치: <span className="font-bold text-blue-600">{(toolSettings.waterlinePosition || 38).toFixed(1)}%</span>
               </span>
-              <span className="text-xs text-gray-500">기준선의 중심점</span>
+              <span className="text-xs text-gray-500">중심 기준선</span>
             </div>
 
             {/* Fine adjustment controls */}
