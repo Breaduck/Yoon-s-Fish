@@ -215,7 +215,7 @@ function AppContent() {
                                 e.stopPropagation();
                                 clearSource();
                               }}
-                              className={`absolute top-4 right-4 w-8 h-8 bg-red-500 hover:bg-red-600 text-white rounded-lg font-bold transition-all z-10 shadow-lg ${
+                              className={`absolute top-4 right-4 w-8 h-8 bg-black/30 hover:bg-black/50 text-white rounded-lg font-bold transition-all z-10 shadow-lg ${
                                 showControlsVideo1 ? 'opacity-100' : 'opacity-0'
                               }`}
                             >
@@ -269,7 +269,7 @@ function AppContent() {
                                 e.stopPropagation();
                                 clearSource2();
                               }}
-                              className={`absolute top-4 right-4 w-8 h-8 bg-red-500 hover:bg-red-600 text-white rounded-lg font-bold transition-all z-10 shadow-lg ${
+                              className={`absolute top-4 right-4 w-8 h-8 bg-black/30 hover:bg-black/50 text-white rounded-lg font-bold transition-all z-10 shadow-lg ${
                                 showControlsVideo2 ? 'opacity-100' : 'opacity-0'
                               }`}
                             >
@@ -335,7 +335,7 @@ function AppContent() {
                                 e.stopPropagation();
                                 clearSource();
                               }}
-                              className={`absolute top-4 right-4 w-10 h-10 bg-red-500 hover:bg-red-600 text-white rounded-xl font-bold text-xl transition-all z-10 shadow-lg ${
+                              className={`absolute top-4 right-4 w-10 h-10 bg-black/30 hover:bg-black/50 text-white rounded-xl font-bold text-xl transition-all z-10 shadow-lg ${
                                 showControls ? 'opacity-100' : 'opacity-0'
                               }`}
                             >
