@@ -6,14 +6,33 @@ interface FrameScrubberProps {
 }
 
 const FrameScrubber: React.FC<FrameScrubberProps> = ({ videoIndex = 0 }) => {
-  const { videoState, seek, videoRef, videoRef2 } = useVideo();
+  const { videoRef, videoRef2 } = useVideo();
   const scrubberRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [fps] = useState(30); // Default 30fps, can be detected
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
 
   const currentVideoRef = videoIndex === 0 ? videoRef : videoRef2;
-  const duration = videoState.duration || 0;
-  const currentTime = videoState.currentTime || 0;
+
+  // Update time from video element
+  useEffect(() => {
+    const video = currentVideoRef.current;
+    if (!video) return;
+
+    const updateTime = () => {
+      setCurrentTime(video.currentTime || 0);
+      setDuration(video.duration || 0);
+    };
+
+    video.addEventListener('timeupdate', updateTime);
+    video.addEventListener('loadedmetadata', updateTime);
+
+    return () => {
+      video.removeEventListener('timeupdate', updateTime);
+      video.removeEventListener('loadedmetadata', updateTime);
+    };
+  }, [currentVideoRef]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     setIsDragging(true);
@@ -31,18 +50,19 @@ const FrameScrubber: React.FC<FrameScrubberProps> = ({ videoIndex = 0 }) => {
   };
 
   const handleScrub = (clientX: number) => {
-    if (!scrubberRef.current || !duration) return;
+    if (!scrubberRef.current || !duration || !currentVideoRef.current) return;
     const rect = scrubberRef.current.getBoundingClientRect();
     const x = Math.max(0, Math.min(clientX - rect.left, rect.width));
     const percent = x / rect.width;
     const newTime = percent * duration;
-    
+
     // Snap to frame
     const frameTime = 1 / fps;
     const frameNumber = Math.round(newTime / frameTime);
     const snappedTime = frameNumber * frameTime;
-    
-    seek(Math.max(0, Math.min(duration, snappedTime)));
+
+    // Seek only this video
+    currentVideoRef.current.currentTime = Math.max(0, Math.min(duration, snappedTime));
   };
 
   useEffect(() => {

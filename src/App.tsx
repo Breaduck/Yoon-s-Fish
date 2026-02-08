@@ -179,7 +179,7 @@ function AppContent() {
                   <div className="space-y-5 w-full">
                     {/* Video player container */}
                     {isComparisonMode ? (
-                      <div className="bg-white rounded-3xl overflow-hidden shadow-xl" style={{ height: 'calc(100vh - 180px)' }}>
+                      <div className="bg-white rounded-3xl overflow-hidden shadow-xl aspect-video">
                       <div
                         className="relative flex gap-3 p-3 h-full"
                         onDragOver={(e) => e.preventDefault()}
@@ -307,12 +307,14 @@ function AppContent() {
                       </div>
                       </div>
                     ) : (
-                      <div className="bg-white rounded-3xl overflow-hidden shadow-xl" style={{ height: 'calc(100vh - 180px)' }}>
-                        <div className="h-full flex flex-col">
+                      <div className="bg-white rounded-3xl overflow-hidden shadow-xl aspect-video">
                         <div
-                          className="flex-1 bg-black relative"
+                          className="h-full flex flex-col"
                           onMouseEnter={() => setShowControls(true)}
                           onMouseLeave={() => setShowControls(false)}
+                        >
+                        <div
+                          className="flex-1 bg-black relative"
                           onDragOver={(e) => e.preventDefault()}
                           onDrop={(e) => {
                             e.preventDefault();
