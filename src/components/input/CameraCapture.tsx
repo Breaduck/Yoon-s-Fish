@@ -19,6 +19,7 @@ const CameraCapture: React.FC = () => {
   const recordingTimeoutRef = useRef<number | null>(null);
   const recordingStartTimeRef = useRef<number>(0);
   const menuRef = useRef<HTMLDivElement>(null);
+  const clipCounterRef = useRef<number>(0);
 
   useEffect(() => {
     loadDevices();
@@ -77,6 +78,7 @@ const CameraCapture: React.FC = () => {
     cameraService.stopCamera();
     setSource({ type: 'file', url: undefined });
     setIsActive(false);
+    clipCounterRef.current = 0; // Reset counter when camera stops
   };
 
   const startRecording = async () => {
@@ -96,9 +98,10 @@ const CameraCapture: React.FC = () => {
         const blob = new Blob(chunks, { type: 'video/webm' });
         const url = URL.createObjectURL(blob);
         const actualDuration = Math.round((Date.now() - startTime) / 1000); // Use captured startTime
+        clipCounterRef.current += 1;
         addClip({
           id: `clip-${Date.now()}`,
-          title: `#${clips.length + 1}`,
+          title: `#${clipCounterRef.current}`,
           blob,
           url,
           duration: actualDuration,

@@ -362,7 +362,7 @@ function AppContent() {
                 </main>
 
               {/* Clip panel - right */}
-              <aside style={{ width: '264px', flexShrink: 0 }}>
+              <aside style={{ width: '185px', flexShrink: 0 }}>
                 <ClipPanel />
               </aside>
             </div>
