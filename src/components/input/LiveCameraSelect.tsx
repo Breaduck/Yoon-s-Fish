@@ -49,21 +49,21 @@ const LiveCameraSelect: React.FC = () => {
                 onClick={() => handleCameraSelect('camera1')}
                 className="w-full px-6 py-4 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-semibold transition-all text-lg"
               >
-                카메라 1 (Before)
+                카메라 1
               </button>
 
               <button
                 onClick={() => handleCameraSelect('camera2')}
                 className="w-full px-6 py-4 bg-green-500 hover:bg-green-600 text-white rounded-xl font-semibold transition-all text-lg"
               >
-                카메라 2 (After)
+                카메라 2
               </button>
 
               <button
                 onClick={() => handleCameraSelect('both')}
                 className="w-full px-6 py-4 bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white rounded-xl font-semibold transition-all text-lg"
               >
-                카메라 1 + 2 (비교)
+                카메라 1 + 2
               </button>
             </div>
 

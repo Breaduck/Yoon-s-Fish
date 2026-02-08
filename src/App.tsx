@@ -167,7 +167,7 @@ function AppContent() {
             </header>
 
             {/* Main content */}
-            <div className="flex gap-3 pl-3 pr-0 py-4 w-full max-w-none">
+            <div className="flex gap-3 pl-3 pr-0 py-4 w-screen max-w-none">
               {/* Tool panel - left */}
               <aside style={{ width: '135px', flexShrink: 0 }}>
                 <ToolPanel />
@@ -203,7 +203,7 @@ function AppContent() {
                           onMouseLeave={() => setShowControlsVideo1(false)}
                         >
                           <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-xl text-sm font-bold text-gray-800 z-10 shadow-lg">
-                            {videoState.source?.type === 'camera' ? '카메라 1' : 'Before'}
+                            {videoState.source?.type === 'camera' || videoState.source?.type === 'stream' ? '카메라 1' : 'Before'}
                           </div>
                           {/* X button to clear video */}
                           {videoState.source && (
@@ -252,7 +252,7 @@ function AppContent() {
                           onMouseLeave={() => setShowControlsVideo2(false)}
                         >
                           <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-xl text-sm font-bold text-gray-800 z-10 shadow-lg">
-                            {secondVideoSource?.type === 'camera' ? '카메라 2' : 'After'}
+                            {secondVideoSource?.type === 'camera' || secondVideoSource?.type === 'stream' ? '카메라 2' : 'After'}
                           </div>
                           {/* X button to clear video */}
                           {secondVideoSource && (
