@@ -14,58 +14,29 @@ const ReferenceLines: React.FC = () => {
   useEffect(() => {
     const lines: ReferenceLine[] = [];
 
-    // Generate horizontal lines with waterline as center
+    // Generate horizontal lines with waterline as anchor (0번)
     if (toolSettings.showHorizontalLines && toolSettings.lineCount > 0) {
-      const waterlinePos = toolSettings.waterlinePosition || 34.7;
+      const WATERLINE_Y = toolSettings.waterlinePosition || 34.7;
 
-      // Always include waterline as one of the lines
-      lines.push({
-        id: 'waterline',
-        type: 'horizontal',
-        position: waterlinePos,
-        color: toolSettings.color,
-        thickness: toolSettings.lineThickness,
-      });
+      // Calculate interval: screen height / (line count + 1)
+      const interval = 100 / (toolSettings.lineCount + 1);
 
-      // Calculate remaining lines to distribute above and below waterline with equal spacing
-      const remainingLines = toolSettings.lineCount - 1;
-      if (remainingLines > 0) {
-        const linesAbove = Math.floor(remainingLines / 2);
-        const linesBelow = Math.ceil(remainingLines / 2);
+      // Generate lines with waterline as center anchor
+      for (let i = 0; i < toolSettings.lineCount; i++) {
+        // Calculate offset from waterline: center lines around waterline
+        const centerOffset = Math.floor(toolSettings.lineCount / 2);
+        const relativeOffset = i - centerOffset;
+        const position = WATERLINE_Y + (interval * relativeOffset);
 
-        // Calculate uniform spacing from waterline
-        // Use the maximum available space to determine spacing
-        const maxSpaceAbove = waterlinePos;
-        const maxSpaceBelow = 100 - waterlinePos;
-        const maxLines = Math.max(linesAbove, linesBelow);
-        const spacing = Math.min(maxSpaceAbove / linesAbove, maxSpaceBelow / linesBelow);
-
-        // Add lines above waterline with equal spacing
-        for (let i = 1; i <= linesAbove; i++) {
-          const position = waterlinePos - spacing * i;
-          if (position >= 0) {
-            lines.push({
-              id: `h-line-above-${i}`,
-              type: 'horizontal',
-              position,
-              color: toolSettings.color,
-              thickness: toolSettings.lineThickness,
-            });
-          }
-        }
-
-        // Add lines below waterline with equal spacing
-        for (let i = 1; i <= linesBelow; i++) {
-          const position = waterlinePos + spacing * i;
-          if (position <= 100) {
-            lines.push({
-              id: `h-line-below-${i}`,
-              type: 'horizontal',
-              position,
-              color: toolSettings.color,
-              thickness: toolSettings.lineThickness,
-            });
-          }
+        // Only render if within screen bounds
+        if (position >= 0 && position <= 100) {
+          lines.push({
+            id: relativeOffset === 0 ? 'waterline' : `h-line-${i}`,
+            type: 'horizontal',
+            position,
+            color: toolSettings.color,
+            thickness: toolSettings.lineThickness,
+          });
         }
       }
     }

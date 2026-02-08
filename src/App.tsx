@@ -19,7 +19,7 @@ import ExportDialog from './components/export/ExportDialog';
 
 function AppContent() {
   const { isComparisonMode, setIsComparisonMode } = useTool();
-  const { videoState, secondVideoSource, setSource, setSource2, clearSource, clearSource2, playVideo1, pauseVideo1, playVideo2, pauseVideo2, playBoth } = useVideo();
+  const { videoState, secondVideoSource, setSource, setSource2, clearSource, clearSource2, play, pause, playVideo1, pauseVideo1, playVideo2, pauseVideo2, playBoth } = useVideo();
   const { annotations, removeArrow, removeFreeDraw, removeAngle } = useAnnotations();
 
   // Hidden file inputs for click-to-upload
@@ -83,19 +83,19 @@ function AppContent() {
           }
         }
       } else if (e.key === ' ') {
-        // Toggle play/pause with spacebar
+        // Toggle play/pause with spacebar (triggers same as play button)
         e.preventDefault();
         if (videoState.isPlaying) {
-          pauseVideo1();
+          pause();
         } else {
-          playVideo1();
+          play();
         }
       }
     };
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [annotations, removeArrow, removeFreeDraw, removeAngle, videoState.isPlaying, playVideo1, pauseVideo1]);
+  }, [annotations, removeArrow, removeFreeDraw, removeAngle, videoState.isPlaying, play, pause]);
 
   return (
           <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50">
