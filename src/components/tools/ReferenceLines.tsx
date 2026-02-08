@@ -14,46 +14,21 @@ const ReferenceLines: React.FC = () => {
   useEffect(() => {
     const lines: ReferenceLine[] = [];
 
-    // Add waterline if set (always the first/main reference line)
-    if (toolSettings.showWaterline && toolSettings.waterlinePosition !== null) {
-      lines.push({
-        id: 'waterline',
-        type: 'horizontal',
-        position: toolSettings.waterlinePosition,
-        color: '#3b82f6', // blue
-        thickness: 3,
-      });
+    // Generate horizontal lines centered around waterline (34% default)
+    if (toolSettings.showHorizontalLines && toolSettings.lineCount > 0) {
+      const waterlinePos = toolSettings.waterlinePosition || 34;
+      const step = 100 / (toolSettings.lineCount + 1);
 
-      // Generate additional horizontal lines if enabled, centered around waterline
-      if (toolSettings.showHorizontalLines && toolSettings.lineCount > 0) {
-        const waterlinePos = toolSettings.waterlinePosition;
-        const step = 100 / (toolSettings.lineCount + 1);
+      for (let i = 1; i <= toolSettings.lineCount; i++) {
+        const offset = (i - (toolSettings.lineCount + 1) / 2) * step;
+        const position = waterlinePos + offset;
 
-        for (let i = 1; i <= toolSettings.lineCount; i++) {
-          const offset = (i - (toolSettings.lineCount + 1) / 2) * step;
-          const position = waterlinePos + offset;
-
-          // Only add lines that are within bounds (0-100%)
-          if (position > 0 && position < 100 && Math.abs(position - waterlinePos) > 2) {
-            lines.push({
-              id: `h-line-${i}`,
-              type: 'horizontal',
-              position: position,
-              color: toolSettings.color,
-              thickness: toolSettings.lineThickness,
-            });
-          }
-        }
-      }
-    } else {
-      // No waterline - use original behavior
-      if (toolSettings.showHorizontalLines) {
-        const hStep = 100 / (toolSettings.lineCount + 1);
-        for (let i = 1; i <= toolSettings.lineCount; i++) {
+        // Only add lines that are within bounds (0-100%)
+        if (position > 0 && position < 100) {
           lines.push({
             id: `h-line-${i}`,
             type: 'horizontal',
-            position: hStep * i,
+            position: position,
             color: toolSettings.color,
             thickness: toolSettings.lineThickness,
           });
@@ -76,14 +51,13 @@ const ReferenceLines: React.FC = () => {
     }
 
     setReferenceLines(lines);
-  }, [toolSettings.lineCount, toolSettings.verticalLineCount, toolSettings.showHorizontalLines, toolSettings.showVerticalLines, toolSettings.color, toolSettings.lineThickness, toolSettings.waterlinePosition, toolSettings.showWaterline, setReferenceLines]);
+  }, [toolSettings.lineCount, toolSettings.verticalLineCount, toolSettings.showHorizontalLines, toolSettings.showVerticalLines, toolSettings.color, toolSettings.lineThickness, toolSettings.waterlinePosition, setReferenceLines]);
 
   // Waterline adjustment functions
   const adjustWaterline = (delta: number) => {
     const currentPos = toolSettings.waterlinePosition || 34;
     const newPos = Math.max(0, Math.min(100, currentPos + delta));
-    updateToolSettings({ waterlinePosition: newPos, showWaterline: true });
-    localStorage.setItem('aquaflux_waterline', JSON.stringify({ yPercent: newPos }));
+    updateToolSettings({ waterlinePosition: newPos });
   };
 
   // Handle waterline click on video
@@ -98,8 +72,7 @@ const ReferenceLines: React.FC = () => {
       const clickY = e.clientY - rect.top;
       const yPercent = Math.max(0, Math.min(100, (clickY / rect.height) * 100));
 
-      updateToolSettings({ waterlinePosition: yPercent, showWaterline: true });
-      localStorage.setItem('aquaflux_waterline', JSON.stringify({ yPercent }));
+      updateToolSettings({ waterlinePosition: yPercent });
 
       setIsSettingWaterline(false);
     };
@@ -209,7 +182,7 @@ const ReferenceLines: React.FC = () => {
       <div className="pt-3 border-t border-gray-200">
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <label className="text-sm font-semibold text-gray-700">수면 기준선</label>
+            <label className="text-sm font-semibold text-gray-700">수면 중심점</label>
             <button
               onClick={() => setIsSettingWaterline(true)}
               className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${
@@ -225,17 +198,9 @@ const ReferenceLines: React.FC = () => {
           <div className="bg-blue-50 p-3 rounded-xl space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-700">
-                위치: <span className="font-bold text-blue-600">{(toolSettings.waterlinePosition || 34).toFixed(1)}%</span>
+                중심: <span className="font-bold text-blue-600">{(toolSettings.waterlinePosition || 34).toFixed(1)}%</span>
               </span>
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={toolSettings.showWaterline}
-                  onChange={(e) => updateToolSettings({ showWaterline: e.target.checked })}
-                  className="w-4 h-4 accent-blue-500 rounded"
-                />
-                <span className="text-sm font-semibold text-gray-700">표시</span>
-              </label>
+              <span className="text-xs text-gray-500">기준선의 중심점</span>
             </div>
 
             {/* Fine adjustment controls */}

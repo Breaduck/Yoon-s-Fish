@@ -55,16 +55,8 @@ export const ToolProvider: React.FC<ToolProviderProps> = ({ children }) => {
   const WATERLINE_Y = 34;
 
   const loadWaterline = () => {
-    try {
-      const saved = localStorage.getItem('aquaflux_waterline');
-      if (saved) {
-        const { yPercent } = JSON.parse(saved);
-        return yPercent;
-      }
-    } catch (e) {
-      console.error('Failed to load waterline:', e);
-    }
-    return WATERLINE_Y; // Default to 34%
+    // Always start with 34%, ignore localStorage
+    return WATERLINE_Y;
   };
 
   const [toolSettings, setToolSettings] = useState<ToolSettings>({

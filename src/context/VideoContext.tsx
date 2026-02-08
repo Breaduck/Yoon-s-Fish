@@ -5,9 +5,11 @@ interface VideoContextType {
   videoState: VideoState;
   videoRef: React.RefObject<HTMLVideoElement>;
   videoRef2: React.RefObject<HTMLVideoElement>;
-  setSource: (source: VideoSource) => void;
+  setSource: (source: VideoSource | null) => void;
   setSource2: (source: VideoSource | null) => void;
   secondVideoSource: VideoSource | null;
+  clearSource: () => void;
+  clearSource2: () => void;
   play: () => void;
   pause: () => void;
   playVideo1: () => void;
@@ -46,12 +48,20 @@ export const VideoProvider: React.FC<VideoProviderProps> = ({ children }) => {
     source: null,
   });
 
-  const setSource = (source: VideoSource) => {
+  const setSource = (source: VideoSource | null) => {
     setVideoState((prev) => ({ ...prev, source }));
   };
 
   const setSource2 = (source: VideoSource | null) => {
     setSecondVideoSource(source);
+  };
+
+  const clearSource = () => {
+    setVideoState((prev) => ({ ...prev, source: null }));
+  };
+
+  const clearSource2 = () => {
+    setSecondVideoSource(null);
   };
 
   const play = () => {
@@ -148,6 +158,8 @@ export const VideoProvider: React.FC<VideoProviderProps> = ({ children }) => {
         setSource,
         setSource2,
         secondVideoSource,
+        clearSource,
+        clearSource2,
         play,
         pause,
         playVideo1,

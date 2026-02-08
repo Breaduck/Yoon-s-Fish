@@ -19,7 +19,7 @@ import ExportDialog from './components/export/ExportDialog';
 
 function AppContent() {
   const { isComparisonMode, setIsComparisonMode } = useTool();
-  const { videoState, secondVideoSource, setSource, setSource2, playVideo1, pauseVideo1, playVideo2, pauseVideo2, playBoth } = useVideo();
+  const { videoState, secondVideoSource, setSource, setSource2, clearSource, clearSource2, playVideo1, pauseVideo1, playVideo2, pauseVideo2, playBoth } = useVideo();
   const { annotations, removeArrow, removeFreeDraw, removeAngle } = useAnnotations();
 
   // Hidden file inputs for click-to-upload
@@ -144,15 +144,15 @@ function AppContent() {
             </header>
 
             {/* Main content */}
-            <div className="flex gap-3 pl-3 pr-0 py-4">
+            <div className="flex gap-3 pl-3 pr-0 py-4 w-full">
               {/* Tool panel - left */}
               <aside style={{ width: '135px', flexShrink: 0 }}>
                 <ToolPanel />
               </aside>
 
               {/* Video area - center, flexible */}
-              <main className="flex-1" style={{ minWidth: 0 }}>
-                  <div className="space-y-5">
+              <main className="flex-1 w-full" style={{ minWidth: 0 }}>
+                  <div className="space-y-5 w-full">
                     {/* Video player container */}
                     {isComparisonMode ? (
                       <div className="bg-white rounded-3xl overflow-hidden aspect-video relative flex gap-3 p-3 shadow-xl">
@@ -165,6 +165,20 @@ function AppContent() {
                           <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-xl text-sm font-bold text-gray-800 z-10 shadow-lg">
                             Before
                           </div>
+                          {/* X button to clear video */}
+                          {videoState.source && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                clearSource();
+                              }}
+                              className={`absolute top-4 right-4 w-8 h-8 bg-red-500 hover:bg-red-600 text-white rounded-lg font-bold transition-all z-10 shadow-lg ${
+                                showControlsVideo1 ? 'opacity-100' : 'opacity-0'
+                              }`}
+                            >
+                              ×
+                            </button>
+                          )}
                           <VideoPlayer />
                           <VideoCanvas />
                           {/* Empty state upload icon for Before video */}
@@ -200,6 +214,20 @@ function AppContent() {
                           <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-xl text-sm font-bold text-gray-800 z-10 shadow-lg">
                             After
                           </div>
+                          {/* X button to clear video */}
+                          {secondVideoSource && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                clearSource2();
+                              }}
+                              className={`absolute top-4 right-4 w-8 h-8 bg-red-500 hover:bg-red-600 text-white rounded-lg font-bold transition-all z-10 shadow-lg ${
+                                showControlsVideo2 ? 'opacity-100' : 'opacity-0'
+                              }`}
+                            >
+                              ×
+                            </button>
+                          )}
                           <VideoPlayer2 />
                           <VideoCanvas2 key={`canvas2-${secondVideoSource?.url || 'none'}`} />
                           {/* Empty state upload icon for After video */}
@@ -233,6 +261,20 @@ function AppContent() {
                           onMouseEnter={() => setShowControls(true)}
                           onMouseLeave={() => setShowControls(false)}
                         >
+                          {/* X button to clear video */}
+                          {videoState.source && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                clearSource();
+                              }}
+                              className={`absolute top-4 right-4 w-10 h-10 bg-red-500 hover:bg-red-600 text-white rounded-xl font-bold text-xl transition-all z-10 shadow-lg ${
+                                showControls ? 'opacity-100' : 'opacity-0'
+                              }`}
+                            >
+                              ×
+                            </button>
+                          )}
                           <VideoPlayer />
                           <VideoCanvas />
                           {/* Empty state upload icon */}
