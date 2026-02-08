@@ -14,57 +14,51 @@ const ReferenceLines: React.FC = () => {
   useEffect(() => {
     const lines: ReferenceLine[] = [];
 
-    // Generate horizontal lines with waterline as anchor (34.7% fixed)
+    // Generate horizontal lines with equal spacing, snapped to waterline (34.7% ±0.3%)
     if (toolSettings.showHorizontalLines && toolSettings.lineCount > 0) {
-      const WATERLINE_Y = toolSettings.waterlinePosition || 34.7;
+      const N = toolSettings.lineCount;
+      const S = 100 / N;  // Equal interval
+      const TARGET_WATERLINE = toolSettings.waterlinePosition || 34.7;
+      const WATERLINE_MIN = 34.4;
+      const WATERLINE_MAX = 35.0;
 
-      // Always include waterline as master line (index 0)
-      lines.push({
-        id: 'waterline',
-        type: 'horizontal',
-        position: WATERLINE_Y,
-        color: toolSettings.color,
-        thickness: toolSettings.lineThickness,
-      });
+      // Calculate initial positions (centered distribution)
+      const initialPositions = Array.from({ length: N }, (_, i) => (i + 0.5) * S);
 
-      // Distribute remaining lines symmetrically around waterline
-      const remainingCount = toolSettings.lineCount - 1;
-      if (remainingCount > 0) {
-        const linesAbove = Math.floor(remainingCount / 2);
-        const linesBelow = remainingCount - linesAbove;
-
-        // Calculate spacing: divide available space evenly
-        const spacingAbove = WATERLINE_Y / (linesAbove + 1);
-        const spacingBelow = (100 - WATERLINE_Y) / (linesBelow + 1);
-
-        // Add lines above waterline (from 0% toward waterline)
-        for (let i = 1; i <= linesAbove; i++) {
-          const position = spacingAbove * i;
-          if (position >= 0 && position <= 100) {
-            lines.push({
-              id: `h-line-above-${i}`,
-              type: 'horizontal',
-              position,
-              color: toolSettings.color,
-              thickness: toolSettings.lineThickness,
-            });
-          }
-        }
-
-        // Add lines below waterline (from waterline toward 100%)
-        for (let i = 1; i <= linesBelow; i++) {
-          const position = WATERLINE_Y + spacingBelow * i;
-          if (position >= 0 && position <= 100) {
-            lines.push({
-              id: `h-line-below-${i}`,
-              type: 'horizontal',
-              position,
-              color: toolSettings.color,
-              thickness: toolSettings.lineThickness,
-            });
-          }
+      // Find closest line to target waterline
+      let closestIndex = 0;
+      let minDiff = Math.abs(initialPositions[0] - TARGET_WATERLINE);
+      for (let i = 1; i < N; i++) {
+        const diff = Math.abs(initialPositions[i] - TARGET_WATERLINE);
+        if (diff < minDiff) {
+          minDiff = diff;
+          closestIndex = i;
         }
       }
+
+      // Calculate offset to snap closest line to waterline (within ±0.3% tolerance)
+      let snapTarget = TARGET_WATERLINE;
+      const closestPos = initialPositions[closestIndex];
+      if (closestPos < WATERLINE_MIN) {
+        snapTarget = WATERLINE_MIN;
+      } else if (closestPos > WATERLINE_MAX) {
+        snapTarget = WATERLINE_MAX;
+      }
+      const offset = snapTarget - closestPos;
+
+      // Apply offset to all lines and filter out-of-bounds
+      initialPositions.forEach((pos, i) => {
+        const finalPos = pos + offset;
+        if (finalPos >= 0 && finalPos <= 100) {
+          lines.push({
+            id: i === closestIndex ? 'waterline' : `h-line-${i}`,
+            type: 'horizontal',
+            position: finalPos,
+            color: toolSettings.color,
+            thickness: toolSettings.lineThickness,
+          });
+        }
+      });
     }
 
     // Generate vertical lines if enabled
