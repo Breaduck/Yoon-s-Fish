@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import { FFmpeg } from '@ffmpeg/ffmpeg';
-import { fetchFile } from '@ffmpeg/util';
+import { fetchFile, toBlobURL } from '@ffmpeg/util';
 import { useVideo } from '../../context/VideoContext';
 import { useAnnotations } from '../../context/AnnotationContext';
 import { useTool } from '../../context/ToolContext';
@@ -74,28 +74,39 @@ const ExportDialog: React.FC = () => {
     }
 
     try {
+      // Try MP4 first, fallback to WebM
+      let mimeType = 'video/webm;codecs=vp9';
+      let needsConversion = true;
+
+      if (MediaRecorder.isTypeSupported('video/mp4')) {
+        mimeType = 'video/mp4';
+        needsConversion = false;
+      } else if (MediaRecorder.isTypeSupported('video/webm;codecs=h264')) {
+        mimeType = 'video/webm;codecs=h264';
+        needsConversion = false;
+      }
+
+      const fileName = `aquaflux-video-${Date.now()}.mp4`;
+
       setProgress({ status: 'preparing', progress: 0, message: 'FFmpeg 로딩 중...' });
 
       // Initialize FFmpeg with proper worker URLs
-      if (!ffmpegRef.current) {
+      if (!ffmpegRef.current && needsConversion) {
         const ffmpeg = new FFmpeg();
         ffmpeg.on('log', ({ message }) => {
-          console.log(message);
+          console.log('[FFmpeg]', message);
         });
         ffmpeg.on('progress', ({ progress }) => {
           setProgress({ status: 'encoding', progress: 90 + progress * 10, message: 'MP4 변환 중...' });
         });
 
-        const baseURL = '/ffmpeg';
+        const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd';
         await ffmpeg.load({
-          coreURL: `${baseURL}/ffmpeg-core.js`,
-          wasmURL: `${baseURL}/ffmpeg-core.wasm`,
+          coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
+          wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
         });
         ffmpegRef.current = ffmpeg;
       }
-
-      const mimeType = 'video/webm;codecs=vp9';
-      const fileName = `aquaflux-video-${Date.now()}.mp4`;
 
       setProgress({ status: 'preparing', progress: 5, message: '준비 중...' });
 
@@ -129,16 +140,16 @@ const ExportDialog: React.FC = () => {
 
       setProgress({ status: 'encoding', progress: 10, message: '녹화 중...' });
 
-      // 비디오 준비
+      // 비디오 준비 - 고속 녹화
       video.pause();
       video.currentTime = 0;
-      video.playbackRate = 3.0;
+      video.playbackRate = 16.0; // 16배속으로 빠르게
       video.muted = true;
 
       if (isComparison && video2) {
         video2.pause();
         video2.currentTime = 0;
-        video2.playbackRate = 3.0;
+        video2.playbackRate = 16.0;
         video2.muted = true;
       }
 
@@ -161,12 +172,12 @@ const ExportDialog: React.FC = () => {
 
         if (video.paused) return;
 
-        // 패딩과 간격 계산 (비교 모드용)
-        const padding = 30;
-        const gap = 30;
+        // 패딩과 간격 계산 (비교 모드용) - Tailwind p-3, gap-3 = 12px
+        const padding = (12 / 1920) * canvas.width; // 12px 비율로 변환
+        const gap = (12 / 1920) * canvas.width;
         const videoWidth = (canvas.width - padding * 2 - gap) / 2;
         const videoHeight = canvas.height - padding * 2;
-        const cornerRadius = 20;
+        const cornerRadius = (16 / 1920) * canvas.width; // rounded-2xl ≈ 16px
 
         // 비교 모드: 현재 UI 레이아웃 그대로
         if (isComparison && video2) {
@@ -179,10 +190,24 @@ const ExportDialog: React.FC = () => {
           drawRoundedRect(ctx, padding, padding, videoWidth, videoHeight, cornerRadius);
           ctx.fill();
 
-          // Before 비디오
+          // Before 비디오 - aspect ratio 유지
           ctx.save();
           clipRoundedRect(ctx, padding, padding, videoWidth, videoHeight, cornerRadius);
-          ctx.drawImage(video, padding, padding, videoWidth, videoHeight);
+          const v1Aspect = video.videoWidth / video.videoHeight;
+          const containerAspect = videoWidth / videoHeight;
+          let v1DrawWidth, v1DrawHeight, v1OffsetX, v1OffsetY;
+          if (v1Aspect > containerAspect) {
+            v1DrawWidth = videoWidth;
+            v1DrawHeight = videoWidth / v1Aspect;
+            v1OffsetX = 0;
+            v1OffsetY = (videoHeight - v1DrawHeight) / 2;
+          } else {
+            v1DrawHeight = videoHeight;
+            v1DrawWidth = videoHeight * v1Aspect;
+            v1OffsetX = (videoWidth - v1DrawWidth) / 2;
+            v1OffsetY = 0;
+          }
+          ctx.drawImage(video, padding + v1OffsetX, padding + v1OffsetY, v1DrawWidth, v1DrawHeight);
           ctx.restore();
 
           // 검은색 배경 (After - 우측)
@@ -190,30 +215,49 @@ const ExportDialog: React.FC = () => {
           drawRoundedRect(ctx, padding + videoWidth + gap, padding, videoWidth, videoHeight, cornerRadius);
           ctx.fill();
 
-          // After 비디오
+          // After 비디오 - aspect ratio 유지
           ctx.save();
           clipRoundedRect(ctx, padding + videoWidth + gap, padding, videoWidth, videoHeight, cornerRadius);
-          ctx.drawImage(video2, padding + videoWidth + gap, padding, videoWidth, videoHeight);
+          const v2Aspect = video2.videoWidth / video2.videoHeight;
+          let v2DrawWidth, v2DrawHeight, v2OffsetX, v2OffsetY;
+          if (v2Aspect > containerAspect) {
+            v2DrawWidth = videoWidth;
+            v2DrawHeight = videoWidth / v2Aspect;
+            v2OffsetX = 0;
+            v2OffsetY = (videoHeight - v2DrawHeight) / 2;
+          } else {
+            v2DrawHeight = videoHeight;
+            v2DrawWidth = videoHeight * v2Aspect;
+            v2OffsetX = (videoWidth - v2DrawWidth) / 2;
+            v2OffsetY = 0;
+          }
+          ctx.drawImage(video2, padding + videoWidth + gap + v2OffsetX, padding + v2OffsetY, v2DrawWidth, v2DrawHeight);
           ctx.restore();
 
-          // Before 라벨 (둥근 네모)
+          // Before 라벨 (둥근 네모) - 중앙 정렬
           ctx.save();
           ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-          drawRoundedRect(ctx, padding + 20, padding + 20, 120, 50, 12);
+          const labelWidth = 120;
+          const labelHeight = 50;
+          drawRoundedRect(ctx, padding + 20, padding + 20, labelWidth, labelHeight, 12);
           ctx.fill();
           ctx.fillStyle = '#083985';
           ctx.font = 'bold 24px sans-serif';
-          ctx.fillText('Before', padding + 40, padding + 50);
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('Before', padding + 20 + labelWidth / 2, padding + 20 + labelHeight / 2);
           ctx.restore();
 
-          // After 라벨 (둥근 네모)
+          // After 라벨 (둥근 네모) - 중앙 정렬
           ctx.save();
           ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-          drawRoundedRect(ctx, padding + videoWidth + gap + 20, padding + 20, 120, 50, 12);
+          drawRoundedRect(ctx, padding + videoWidth + gap + 20, padding + 20, labelWidth, labelHeight, 12);
           ctx.fill();
           ctx.fillStyle = '#083985';
           ctx.font = 'bold 24px sans-serif';
-          ctx.fillText('After', padding + videoWidth + gap + 40, padding + 50);
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('After', padding + videoWidth + gap + 20 + labelWidth / 2, padding + 20 + labelHeight / 2);
           ctx.restore();
         } else {
           ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
@@ -379,30 +423,55 @@ const ExportDialog: React.FC = () => {
         }
       };
 
-      // 녹화 완료 후 MP4 변환
+      // 녹화 완료 후 처리
       recorder.onstop = async () => {
         try {
-          const webmBlob = new Blob(chunks, { type: mimeType });
-          setProgress({ status: 'encoding', progress: 90, message: 'MP4 변환 중...' });
+          const recordedBlob = new Blob(chunks, { type: mimeType });
 
-          const ffmpeg = ffmpegRef.current!;
-          await ffmpeg.writeFile('input.webm', await fetchFile(webmBlob));
-          await ffmpeg.exec(['-i', 'input.webm', '-c:v', 'libx264', '-preset', 'ultrafast', 'output.mp4']);
+          if (!needsConversion) {
+            // Direct download without conversion
+            setProgress({ status: 'encoding', progress: 95, message: '다운로드 준비 중...' });
+            const url = URL.createObjectURL(recordedBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+          } else {
+            // FFmpeg conversion
+            try {
+              setProgress({ status: 'encoding', progress: 90, message: 'MP4 변환 중...' });
+              const ffmpeg = ffmpegRef.current!;
 
-          const data = await ffmpeg.readFile('output.mp4');
-          const mp4Blob = new Blob([new Uint8Array(data as Uint8Array)], { type: 'video/mp4' });
+              console.log('[Export] Writing WebM file...');
+              await ffmpeg.writeFile('input.webm', await fetchFile(recordedBlob));
 
-          const url = URL.createObjectURL(mp4Blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = fileName;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
+              console.log('[Export] Starting FFmpeg conversion...');
+              await ffmpeg.exec(['-i', 'input.webm', '-c:v', 'libx264', '-preset', 'ultrafast', '-crf', '23', 'output.mp4']);
 
-          await ffmpeg.deleteFile('input.webm');
-          await ffmpeg.deleteFile('output.mp4');
+              console.log('[Export] Reading output...');
+              const data = await ffmpeg.readFile('output.mp4');
+              const mp4Blob = new Blob([new Uint8Array(data as Uint8Array)], { type: 'video/mp4' });
+
+              const url = URL.createObjectURL(mp4Blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = fileName;
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+              URL.revokeObjectURL(url);
+
+              await ffmpeg.deleteFile('input.webm');
+              await ffmpeg.deleteFile('output.mp4');
+              console.log('[Export] Conversion complete');
+            } catch (ffmpegError) {
+              console.error('[Export] FFmpeg error:', ffmpegError);
+              throw new Error('MP4 변환 실패: ' + String(ffmpegError));
+            }
+          }
 
           video.playbackRate = 1.0;
           video.muted = false;

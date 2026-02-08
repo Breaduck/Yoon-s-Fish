@@ -1,5 +1,5 @@
 export interface VideoSource {
-  type: 'file' | 'camera';
+  type: 'file' | 'camera' | 'stream';
   url?: string;
   stream?: MediaStream;
 }

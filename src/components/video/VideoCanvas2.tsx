@@ -86,15 +86,49 @@ const VideoCanvas2: React.FC = () => {
     }
   }, [videoState.currentTime, annotations, removeArrow, removeFreeDraw, removeAngle]);
 
-  // Initialize canvas size
+  // Initialize canvas size and position to match video rendered area
   useEffect(() => {
     const video = videoRef2.current;
     const canvas = canvasRef.current;
     if (!video || !canvas) return;
 
     const updateCanvasSize = () => {
-      canvas.width = video.videoWidth || video.clientWidth;
-      canvas.height = video.videoHeight || video.clientHeight;
+      const containerWidth = video.clientWidth;
+      const containerHeight = video.clientHeight;
+      const videoWidth = video.videoWidth;
+      const videoHeight = video.videoHeight;
+
+      if (!videoWidth || !videoHeight) return;
+
+      // Calculate actual rendered video dimensions (object-fit: contain)
+      const videoAspect = videoWidth / videoHeight;
+      const containerAspect = containerWidth / containerHeight;
+
+      let renderedWidth, renderedHeight, offsetX, offsetY;
+
+      if (videoAspect > containerAspect) {
+        // Video is wider - fit to width
+        renderedWidth = containerWidth;
+        renderedHeight = containerWidth / videoAspect;
+        offsetX = 0;
+        offsetY = (containerHeight - renderedHeight) / 2;
+      } else {
+        // Video is taller - fit to height
+        renderedHeight = containerHeight;
+        renderedWidth = containerHeight * videoAspect;
+        offsetX = (containerWidth - renderedWidth) / 2;
+        offsetY = 0;
+      }
+
+      // Set canvas internal resolution to video resolution for quality
+      canvas.width = videoWidth;
+      canvas.height = videoHeight;
+
+      // Position canvas to match rendered video area exactly
+      canvas.style.width = `${renderedWidth}px`;
+      canvas.style.height = `${renderedHeight}px`;
+      canvas.style.left = `${offsetX}px`;
+      canvas.style.top = `${offsetY}px`;
 
       if (!drawingEngineRef.current) {
         drawingEngineRef.current = new DrawingEngine(canvas);
@@ -104,10 +138,16 @@ const VideoCanvas2: React.FC = () => {
     };
 
     video.addEventListener('loadedmetadata', updateCanvasSize);
+    video.addEventListener('resize', updateCanvasSize);
     updateCanvasSize();
+
+    // Also update on window resize
+    window.addEventListener('resize', updateCanvasSize);
 
     return () => {
       video.removeEventListener('loadedmetadata', updateCanvasSize);
+      video.removeEventListener('resize', updateCanvasSize);
+      window.removeEventListener('resize', updateCanvasSize);
     };
   }, [videoRef2]);
 
@@ -124,27 +164,25 @@ const VideoCanvas2: React.FC = () => {
       const video = videoRef2.current;
       drawingEngine.clear();
 
-      // Draw reference lines within video display area only
-      if (annotations.referenceLines.length > 0 && video) {
-        const videoArea = getVideoDisplayArea(video, canvas.width, canvas.height);
-
+      // Draw reference lines - canvas is already sized to video, so use full canvas
+      if (annotations.referenceLines.length > 0) {
         ctx.save();
         annotations.referenceLines.forEach((line) => {
           if (line.type === 'horizontal') {
-            const y = videoArea.y + (line.position / 100) * videoArea.height;
+            const y = (line.position / 100) * canvas.height;
             ctx.strokeStyle = line.color;
             ctx.lineWidth = line.thickness;
             ctx.beginPath();
-            ctx.moveTo(videoArea.x, y);
-            ctx.lineTo(videoArea.x + videoArea.width, y);
+            ctx.moveTo(0, y);
+            ctx.lineTo(canvas.width, y);
             ctx.stroke();
           } else {
-            const x = videoArea.x + (line.position / 100) * videoArea.width;
+            const x = (line.position / 100) * canvas.width;
             ctx.strokeStyle = line.color;
             ctx.lineWidth = line.thickness;
             ctx.beginPath();
-            ctx.moveTo(x, videoArea.y);
-            ctx.lineTo(x, videoArea.y + videoArea.height);
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, canvas.height);
             ctx.stroke();
           }
         });

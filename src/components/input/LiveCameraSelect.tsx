@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import ReactDOM from 'react-dom';
 import { useVideo } from '../../context/VideoContext';
 import { useTool } from '../../context/ToolContext';
 
@@ -34,12 +35,12 @@ const LiveCameraSelect: React.FC = () => {
         실시간 카메라
       </button>
 
-      {showModal && (
+      {showModal && ReactDOM.createPortal(
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-6"
-          style={{ zIndex: 999999, overflow: 'auto' }}
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center p-6 overflow-y-auto"
+          style={{ zIndex: 999999, top: 0, left: 0, right: 0, bottom: 0, position: 'fixed' }}
         >
-          <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full my-auto" style={{ maxHeight: '85vh', display: 'flex', flexDirection: 'column' }}>
+          <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full mt-20 mb-6" style={{ maxHeight: 'calc(100vh - 8rem)', display: 'flex', flexDirection: 'column' }}>
             <div className="p-8 overflow-y-auto" style={{ flex: '1 1 auto', minHeight: 0 }}>
               <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">카메라 선택</h3>
 
@@ -82,7 +83,8 @@ const LiveCameraSelect: React.FC = () => {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );

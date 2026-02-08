@@ -17,7 +17,11 @@
       "Bash(wrangler pages deploy:*)",
       "Bash(npx wrangler deploy:*)",
       "Bash(powershell:*)",
-      "Bash(./mediamtx.exe:*)"
+      "Bash(./mediamtx.exe:*)",
+      "Bash(git fetch:*)",
+      "Bash(git pull:*)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)"
     ]
   }
 }

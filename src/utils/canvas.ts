@@ -245,14 +245,14 @@ export const getVideoDisplayArea = (
   if (videoAspect > canvasAspect) {
     // Video is wider - fit to width, letterbox top/bottom
     displayWidth = canvasWidth;
-    displayHeight = canvasWidth / videoAspect;
+    displayHeight = Math.round(canvasWidth / videoAspect);
     x = 0;
-    y = (canvasHeight - displayHeight) / 2;
+    y = Math.round((canvasHeight - displayHeight) / 2);
   } else {
     // Video is taller - fit to height, pillarbox left/right
     displayHeight = canvasHeight;
-    displayWidth = canvasHeight * videoAspect;
-    x = (canvasWidth - displayWidth) / 2;
+    displayWidth = Math.round(canvasHeight * videoAspect);
+    x = Math.round((canvasWidth - displayWidth) / 2);
     y = 0;
   }
 
