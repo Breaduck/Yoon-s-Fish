@@ -87,9 +87,9 @@ const CompactToolbar: React.FC = () => {
             실선
           </button>
           <button
-            onClick={() => updateToolSettings({ arrowStyle: 'dashed' })}
+            onClick={() => updateToolSettings({ arrowStyle: toolSettings.arrowStyle === 'solid' ? 'dash-short' : 'solid' })}
             className={`w-full px-2 py-1 rounded text-xs ${
-              toolSettings.arrowStyle === 'dashed'
+              toolSettings.arrowStyle !== 'solid'
                 ? 'bg-emerald-600 text-white'
                 : 'bg-gray-700 text-gray-300'
             }`}

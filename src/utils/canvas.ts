@@ -25,11 +25,17 @@ export const drawArrow = (
   ctx.lineWidth = thickness;
   ctx.lineCap = 'butt';
 
-  // Set dash pattern for dashed arrows (scale with thickness)
-  if (style === 'dashed') {
-    const dashLength = Math.max(15, thickness * 4);
-    const gapLength = Math.max(10, thickness * 2.5);
-    ctx.setLineDash([dashLength, gapLength]);
+  // Set dash pattern based on style (scale with thickness)
+  if (style === 'dash-short') {
+    ctx.setLineDash([thickness * 2, thickness]);
+  } else if (style === 'dash-long') {
+    ctx.setLineDash([thickness * 4, thickness * 2]);
+  } else if (style === 'dot') {
+    ctx.setLineDash([thickness * 0.5, thickness * 1.5]);
+  } else if (style === 'dash-dot') {
+    ctx.setLineDash([thickness * 3, thickness, thickness * 0.5, thickness]);
+  } else if (style === 'dash-dot-dot') {
+    ctx.setLineDash([thickness * 3, thickness, thickness * 0.5, thickness, thickness * 0.5, thickness]);
   }
 
   // Draw line to triangle base

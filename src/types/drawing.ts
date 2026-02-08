@@ -3,7 +3,7 @@ export interface Point {
   y: number;
 }
 
-export type ArrowStyle = 'solid' | 'dashed';
+export type ArrowStyle = 'solid' | 'dash-short' | 'dash-long' | 'dot' | 'dash-dot' | 'dash-dot-dot';
 
 export interface Arrow {
   id: string;

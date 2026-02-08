@@ -128,9 +128,15 @@ const ToolPanel: React.FC = () => {
                 실선
               </button>
               <button
-                onClick={() => updateToolSettings({ arrowStyle: 'dashed' })}
+                onClick={() => {
+                  if (toolSettings.arrowStyle === 'solid') {
+                    updateToolSettings({ arrowStyle: 'dash-short' });
+                  } else {
+                    updateToolSettings({ arrowStyle: 'solid' });
+                  }
+                }}
                 className={`px-3 py-2 rounded-lg text-sm font-semibold transition-all ${
-                  toolSettings.arrowStyle === 'dashed'
+                  toolSettings.arrowStyle !== 'solid'
                     ? 'bg-blue-500 text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
@@ -138,6 +144,62 @@ const ToolPanel: React.FC = () => {
                 점선
               </button>
             </div>
+
+            {/* Dash pattern options when dashed is selected */}
+            {toolSettings.arrowStyle !== 'solid' && (
+              <div className="mt-3 space-y-1">
+                <button
+                  onClick={() => updateToolSettings({ arrowStyle: 'dash-short' })}
+                  className={`w-full px-2 py-1.5 rounded text-xs font-semibold transition-all ${
+                    toolSettings.arrowStyle === 'dash-short'
+                      ? 'bg-blue-400 text-white'
+                      : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  짧은 점선
+                </button>
+                <button
+                  onClick={() => updateToolSettings({ arrowStyle: 'dash-long' })}
+                  className={`w-full px-2 py-1.5 rounded text-xs font-semibold transition-all ${
+                    toolSettings.arrowStyle === 'dash-long'
+                      ? 'bg-blue-400 text-white'
+                      : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  긴 점선
+                </button>
+                <button
+                  onClick={() => updateToolSettings({ arrowStyle: 'dot' })}
+                  className={`w-full px-2 py-1.5 rounded text-xs font-semibold transition-all ${
+                    toolSettings.arrowStyle === 'dot'
+                      ? 'bg-blue-400 text-white'
+                      : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  점
+                </button>
+                <button
+                  onClick={() => updateToolSettings({ arrowStyle: 'dash-dot' })}
+                  className={`w-full px-2 py-1.5 rounded text-xs font-semibold transition-all ${
+                    toolSettings.arrowStyle === 'dash-dot'
+                      ? 'bg-blue-400 text-white'
+                      : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  긴선-점
+                </button>
+                <button
+                  onClick={() => updateToolSettings({ arrowStyle: 'dash-dot-dot' })}
+                  className={`w-full px-2 py-1.5 rounded text-xs font-semibold transition-all ${
+                    toolSettings.arrowStyle === 'dash-dot-dot'
+                      ? 'bg-blue-400 text-white'
+                      : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  긴선-점-점
+                </button>
+              </div>
+            )}
           </div>
 
           <div>
