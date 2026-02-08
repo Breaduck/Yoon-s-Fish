@@ -98,7 +98,7 @@ function AppContent() {
   }, [annotations, removeArrow, removeFreeDraw, removeAngle, videoState.isPlaying, play, pause]);
 
   return (
-          <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50">
+          <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50 w-full max-w-none">
             {/* Hidden file inputs for click-to-upload */}
             <input
               ref={fileInputRef}
@@ -123,7 +123,7 @@ function AppContent() {
 
             {/* Header */}
             <header className="bg-white/80 backdrop-blur-lg border-b border-gray-200 shadow-sm relative overflow-visible" style={{ zIndex: 100000 }}>
-              <div className="px-6 py-6 flex items-center justify-between min-h-[80px]">
+              <div className="px-3 py-6 flex items-center justify-between min-h-[80px]">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-2xl flex items-center justify-center" style={{ backgroundColor: '#083985' }}>
                     <span className="text-white font-bold text-xl">A</span>
@@ -158,7 +158,7 @@ function AppContent() {
             </header>
 
             {/* Main content */}
-            <div className="flex gap-3 pl-3 pr-0 py-4 w-full">
+            <div className="flex gap-0 pl-0 pr-0 py-0 w-full max-w-none">
               {/* Tool panel - left */}
               <aside style={{ width: '135px', flexShrink: 0 }}>
                 <ToolPanel />
