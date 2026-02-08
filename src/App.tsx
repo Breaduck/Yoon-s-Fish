@@ -307,14 +307,11 @@ function AppContent() {
                       </div>
                       </div>
                     ) : (
-                      <div className="bg-white rounded-3xl overflow-hidden shadow-xl aspect-video">
+                      <div className="bg-white rounded-3xl overflow-hidden shadow-xl">
                         <div
-                          className="h-full flex flex-col"
+                          className="bg-black aspect-video relative"
                           onMouseEnter={() => setShowControls(true)}
                           onMouseLeave={() => setShowControls(false)}
-                        >
-                        <div
-                          className="flex-1 bg-black relative"
                           onDragOver={(e) => e.preventDefault()}
                           onDrop={(e) => {
                             e.preventDefault();
@@ -370,9 +367,8 @@ function AppContent() {
                             <VideoControls videoIndex={0} />
                           </div>
                         </div>
-                        {/* Frame scrubber */}
+                        {/* Frame scrubber outside aspect-video */}
                         <FrameScrubber videoIndex={0} />
-                        </div>
                       </div>
                     )}
 
