@@ -51,7 +51,9 @@ export const ToolProvider: React.FC<ToolProviderProps> = ({ children }) => {
   const [isComparisonMode, setIsComparisonMode] = useState(false);
   const [isToolPanelCollapsed, setIsToolPanelCollapsed] = useState(false);
 
-  // Load waterline from localStorage
+  // Fixed waterline position at 34%
+  const WATERLINE_Y = 34;
+
   const loadWaterline = () => {
     try {
       const saved = localStorage.getItem('aquaflux_waterline');
@@ -62,7 +64,7 @@ export const ToolProvider: React.FC<ToolProviderProps> = ({ children }) => {
     } catch (e) {
       console.error('Failed to load waterline:', e);
     }
-    return null;
+    return WATERLINE_Y; // Default to 34%
   };
 
   const [toolSettings, setToolSettings] = useState<ToolSettings>({

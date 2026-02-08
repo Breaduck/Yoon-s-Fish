@@ -78,29 +78,13 @@ const ReferenceLines: React.FC = () => {
     setReferenceLines(lines);
   }, [toolSettings.lineCount, toolSettings.verticalLineCount, toolSettings.showHorizontalLines, toolSettings.showVerticalLines, toolSettings.color, toolSettings.lineThickness, toolSettings.waterlinePosition, toolSettings.showWaterline, setReferenceLines]);
 
-  // Handle waterline click on video
-  useEffect(() => {
-    if (!isSettingWaterline) return;
-
-    const handleClick = (e: MouseEvent) => {
-      const video = videoRef.current;
-      if (!video) return;
-
-      const rect = video.getBoundingClientRect();
-      const clickY = e.clientY - rect.top;
-      const yPercent = Math.max(0, Math.min(100, (clickY / rect.height) * 100));
-
-      // Save waterline position
-      updateToolSettings({ waterlinePosition: yPercent, showWaterline: true });
-      localStorage.setItem('aquaflux_waterline', JSON.stringify({ yPercent }));
-
-      setIsSettingWaterline(false);
-      alert(`수면 위치가 설정되었습니다 (${yPercent.toFixed(1)}%)`);
-    };
-
-    document.addEventListener('click', handleClick);
-    return () => document.removeEventListener('click', handleClick);
-  }, [isSettingWaterline, videoRef, updateToolSettings]);
+  // Removed touch/click waterline setting - using fine adjustment buttons only
+  const adjustWaterline = (delta: number) => {
+    const currentPos = toolSettings.waterlinePosition || 34;
+    const newPos = Math.max(0, Math.min(100, currentPos + delta));
+    updateToolSettings({ waterlinePosition: newPos, showWaterline: true });
+    localStorage.setItem('aquaflux_waterline', JSON.stringify({ yPercent: newPos }));
+  };
 
   return (
     <div className="space-y-5 pt-5 border-t border-gray-200">
@@ -199,27 +183,15 @@ const ReferenceLines: React.FC = () => {
         </div>
       )}
 
-      {/* Waterline Section */}
+      {/* Waterline Section - Fixed at 34% with fine adjustment */}
       <div className="pt-3 border-t border-gray-200">
         <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <label className="text-sm font-semibold text-gray-700">수면 기준선</label>
-            <button
-              onClick={() => setIsSettingWaterline(true)}
-              className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${
-                isSettingWaterline
-                  ? 'bg-cyan-500 text-white'
-                  : 'bg-cyan-100 hover:bg-cyan-200 text-cyan-700'
-              }`}
-            >
-              {isSettingWaterline ? '→ 영상 클릭' : '위치 설정'}
-            </button>
-          </div>
+          <label className="text-sm font-semibold text-gray-700">수면 기준선 (고정)</label>
 
-          {toolSettings.waterlinePosition !== null && (
-            <div className="flex items-center justify-between bg-blue-50 p-3 rounded-xl">
+          <div className="bg-blue-50 p-3 rounded-xl space-y-3">
+            <div className="flex items-center justify-between">
               <span className="text-sm text-gray-700">
-                현재 위치: <span className="font-bold text-blue-600">{toolSettings.waterlinePosition.toFixed(1)}%</span>
+                위치: <span className="font-bold text-blue-600">{(toolSettings.waterlinePosition || 34).toFixed(1)}%</span>
               </span>
               <label className="flex items-center gap-2">
                 <input
@@ -231,13 +203,28 @@ const ReferenceLines: React.FC = () => {
                 <span className="text-sm font-semibold text-gray-700">표시</span>
               </label>
             </div>
-          )}
 
-          {toolSettings.waterlinePosition === null && (
-            <p className="text-xs text-gray-500 bg-gray-50 p-3 rounded-xl">
-              수면 위치를 설정하려면 "위치 설정" 버튼을 클릭한 후 영상에서 수면을 클릭하세요.
-            </p>
-          )}
+            {/* Fine adjustment controls */}
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-xs text-gray-600">미세 조정 (0.1%)</span>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => adjustWaterline(-0.1)}
+                  className="w-8 h-8 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg font-bold transition-all"
+                  title="아래로"
+                >
+                  ↓
+                </button>
+                <button
+                  onClick={() => adjustWaterline(0.1)}
+                  className="w-8 h-8 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg font-bold transition-all"
+                  title="위로"
+                >
+                  ↑
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
