@@ -132,8 +132,8 @@ function AppContent() {
 
             {/* Header */}
             <header className="bg-white/80 backdrop-blur-lg border-b border-gray-200 shadow-sm relative overflow-visible" style={{ zIndex: 100000 }}>
-              <div className="px-3 py-6 flex items-center justify-between min-h-[80px]">
-                <div className="flex items-center gap-3">
+              <div className="px-0 py-6 flex items-center justify-between min-h-[80px]">
+                <div className="flex items-center gap-3 ml-3">
                   <div className="w-10 h-10 rounded-2xl flex items-center justify-center" style={{ backgroundColor: '#083985' }}>
                     <span className="text-white font-bold text-xl">A</span>
                   </div>
@@ -141,7 +141,7 @@ function AppContent() {
                     AQUAFLUX
                   </h1>
                 </div>
-                <div className="flex gap-3">
+                <div className="flex gap-3 mr-3">
                   <button
                     onClick={() => setIsComparisonMode(!isComparisonMode)}
                     className={`px-5 py-2.5 rounded-xl font-semibold transition-all duration-200 ${
@@ -310,6 +310,12 @@ function AppContent() {
                             }
                           }}
                         >
+                          {/* Camera label for single mode */}
+                          {videoState.source && (videoState.source.type === 'camera' || videoState.source.type === 'stream') && (
+                            <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-xl text-sm font-bold text-gray-800 z-10 shadow-lg">
+                              {videoState.source.url?.includes('camera2') ? '카메라 2' : '카메라 1'}
+                            </div>
+                          )}
                           {/* X button to clear video */}
                           {videoState.source && (
                             <button
