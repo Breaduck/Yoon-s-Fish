@@ -39,15 +39,13 @@ const FrameScrubber: React.FC<FrameScrubberProps> = ({ videoIndex = 0 }) => {
     handleScrub(e.clientX);
   };
 
-  const handleMouseMove = (e: MouseEvent) => {
-    if (isDragging) {
-      handleScrub(e.clientX);
-    }
-  };
+  const handleMouseMove = useRef((e: MouseEvent) => {
+    handleScrub(e.clientX);
+  }).current;
 
-  const handleMouseUp = () => {
+  const handleMouseUp = useRef(() => {
     setIsDragging(false);
-  };
+  }).current;
 
   const handleScrub = (clientX: number) => {
     if (!scrubberRef.current || !duration || !currentVideoRef.current) return;
@@ -61,28 +59,33 @@ const FrameScrubber: React.FC<FrameScrubberProps> = ({ videoIndex = 0 }) => {
     const frameNumber = Math.round(newTime / frameTime);
     const snappedTime = frameNumber * frameTime;
 
-    // Seek only this video
-    currentVideoRef.current.currentTime = Math.max(0, Math.min(duration, snappedTime));
+    // Seek only this video (smooth seeking)
+    const video = currentVideoRef.current;
+    video.currentTime = Math.max(0, Math.min(duration, snappedTime));
   };
 
   useEffect(() => {
     if (isDragging) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
+      const moveHandler = (e: MouseEvent) => handleScrub(e.clientX);
+      const upHandler = () => setIsDragging(false);
+
+      document.addEventListener('mousemove', moveHandler);
+      document.addEventListener('mouseup', upHandler);
+
       return () => {
-        document.removeEventListener('mousemove', handleMouseMove);
-        document.removeEventListener('mouseup', handleMouseUp);
+        document.removeEventListener('mousemove', moveHandler);
+        document.removeEventListener('mouseup', upHandler);
       };
     }
-  }, [isDragging]);
+  }, [isDragging, handleScrub]);
 
   const playheadPosition = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   return (
-    <div className="w-full px-2 py-1 bg-gray-900">
+    <div className="w-full px-2 py-1 bg-gray-900 rounded-b-2xl">
       <div
         ref={scrubberRef}
-        className="relative w-full h-6 bg-gray-800 rounded cursor-pointer"
+        className="relative w-full h-6 bg-gray-800 rounded-lg cursor-pointer"
         onMouseDown={handleMouseDown}
       >
         {/* Ruler marks */}
