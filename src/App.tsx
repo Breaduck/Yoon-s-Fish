@@ -19,7 +19,7 @@ import ExportDialog from './components/export/ExportDialog';
 
 function AppContent() {
   const { isComparisonMode, setIsComparisonMode } = useTool();
-  const { videoState, secondVideoSource, setSource, setSource2, clearSource, clearSource2, play, pause, seek, playVideo1, pauseVideo1, playVideo2, pauseVideo2, playBoth } = useVideo();
+  const { videoState, secondVideoSource, setSource, setSource2, clearSource, clearSource2, play, pause, seek, videoRef, playVideo1, pauseVideo1, playVideo2, pauseVideo2, playBoth } = useVideo();
   const { annotations, removeArrow, removeFreeDraw, removeAngle } = useAnnotations();
   const { clips } = useClips();
 
