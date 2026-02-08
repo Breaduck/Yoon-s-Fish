@@ -144,7 +144,7 @@ function AppContent() {
             </header>
 
             {/* Main content */}
-            <div className="flex gap-3 px-3 py-4">
+            <div className="flex gap-3 pl-3 pr-0 py-4">
               {/* Tool panel - left */}
               <aside style={{ width: '135px', flexShrink: 0 }}>
                 <ToolPanel />
