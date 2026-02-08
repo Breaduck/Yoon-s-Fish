@@ -10,11 +10,36 @@ interface VideoControlsProps {
 }
 
 const VideoControls: React.FC<VideoControlsProps> = ({ videoIndex = 0 }) => {
-  const { videoState, play, pause, playVideo1, pauseVideo1, playVideo2, pauseVideo2, setPlaybackRate, seek } = useVideo();
+  const { videoState, play, pause, playVideo1, pauseVideo1, playVideo2, pauseVideo2, setPlaybackRate, seek, videoRef, videoRef2 } = useVideo();
   const { setIsFullscreen } = useTool();
   const [showSpeedMenu, setShowSpeedMenu] = useState(false);
   const [customSpeed, setCustomSpeed] = useState('');
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
   const speedMenuRef = useRef<HTMLDivElement>(null);
+
+  const currentVideoRef = videoIndex === 0 ? videoRef : videoRef2;
+
+  // Update time from video element
+  useEffect(() => {
+    const video = currentVideoRef.current;
+    if (!video) return;
+
+    const updateTime = () => {
+      setCurrentTime(video.currentTime || 0);
+      setDuration(video.duration || 0);
+    };
+
+    video.addEventListener('timeupdate', updateTime);
+    video.addEventListener('loadedmetadata', updateTime);
+    video.addEventListener('durationchange', updateTime);
+
+    return () => {
+      video.removeEventListener('timeupdate', updateTime);
+      video.removeEventListener('loadedmetadata', updateTime);
+      video.removeEventListener('durationchange', updateTime);
+    };
+  }, [currentVideoRef]);
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -53,11 +78,15 @@ const VideoControls: React.FC<VideoControlsProps> = ({ videoIndex = 0 }) => {
   };
 
   const handleSeekBack = () => {
-    seek(Math.max(0, videoState.currentTime - 5));
+    if (currentVideoRef.current) {
+      currentVideoRef.current.currentTime = Math.max(0, currentTime - 5);
+    }
   };
 
   const handleSeekForward = () => {
-    seek(Math.min(videoState.duration, videoState.currentTime + 5));
+    if (currentVideoRef.current) {
+      currentVideoRef.current.currentTime = Math.min(duration, currentTime + 5);
+    }
   };
 
   const formatTime = (seconds: number) => {
@@ -73,21 +102,25 @@ const VideoControls: React.FC<VideoControlsProps> = ({ videoIndex = 0 }) => {
       {/* Progress bar - prominent at top */}
       <div className="flex items-center gap-3">
         <div className="text-white text-xs font-medium drop-shadow-lg">
-          {formatTime(videoState.currentTime)}
+          {formatTime(currentTime)}
         </div>
         <input
           type="range"
           min="0"
-          max={videoState.duration || 100}
-          value={videoState.currentTime}
-          onChange={(e) => seek(parseFloat(e.target.value))}
+          max={duration || 100}
+          value={currentTime}
+          onChange={(e) => {
+            if (currentVideoRef.current) {
+              currentVideoRef.current.currentTime = parseFloat(e.target.value);
+            }
+          }}
           className="flex-1 h-1 bg-white/30 rounded-full appearance-none cursor-pointer accent-blue-500"
           style={{
-            backgroundImage: `linear-gradient(to right, rgb(59, 130, 246) 0%, rgb(59, 130, 246) ${(videoState.currentTime / videoState.duration) * 100}%, rgba(255,255,255,0.3) ${(videoState.currentTime / videoState.duration) * 100}%, rgba(255,255,255,0.3) 100%)`
+            backgroundImage: `linear-gradient(to right, rgb(59, 130, 246) 0%, rgb(59, 130, 246) ${duration > 0 ? (currentTime / duration) * 100 : 0}%, rgba(255,255,255,0.3) ${duration > 0 ? (currentTime / duration) * 100 : 0}%, rgba(255,255,255,0.3) 100%)`
           }}
         />
         <div className="text-white text-xs font-medium drop-shadow-lg">
-          {formatTime(videoState.duration)}
+          {formatTime(duration)}
         </div>
       </div>
 

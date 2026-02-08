@@ -168,7 +168,7 @@ function AppContent() {
             </header>
 
             {/* Main content */}
-            <div className="flex gap-3 pl-0 pr-0 py-2 w-full max-w-none">
+            <div className="flex gap-3 pl-0 pr-0 py-1 w-full max-w-none">
               {/* Tool panel - left */}
               <aside className="ml-3" style={{ width: '135px', flexShrink: 0 }}>
                 <ToolPanel />
@@ -253,7 +253,7 @@ function AppContent() {
                         </div>
 
                         {/* After Video - Right */}
-                        <div className="flex-1 flex flex-col">
+                        <div className="flex-1 flex flex-col" style={{ position: 'relative', zIndex: 1 }}>
                         <div
                           className="flex-1 relative bg-black rounded-2xl overflow-hidden"
                           onMouseEnter={() => setShowControlsVideo2(true)}

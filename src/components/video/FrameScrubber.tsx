@@ -15,24 +15,28 @@ const FrameScrubber: React.FC<FrameScrubberProps> = ({ videoIndex = 0 }) => {
 
   const currentVideoRef = videoIndex === 0 ? videoRef : videoRef2;
 
-  // Update time from video element
+  // Update time from video element (only when not dragging)
   useEffect(() => {
     const video = currentVideoRef.current;
     if (!video) return;
 
     const updateTime = () => {
-      setCurrentTime(video.currentTime || 0);
-      setDuration(video.duration || 0);
+      if (!isDragging) {
+        setCurrentTime(video.currentTime || 0);
+        setDuration(video.duration || 0);
+      }
     };
 
     video.addEventListener('timeupdate', updateTime);
     video.addEventListener('loadedmetadata', updateTime);
+    video.addEventListener('durationchange', updateTime);
 
     return () => {
       video.removeEventListener('timeupdate', updateTime);
       video.removeEventListener('loadedmetadata', updateTime);
+      video.removeEventListener('durationchange', updateTime);
     };
-  }, [currentVideoRef]);
+  }, [currentVideoRef, isDragging]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     setIsDragging(true);
