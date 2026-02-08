@@ -16,7 +16,7 @@ const ReferenceLines: React.FC = () => {
 
     // Generate horizontal lines with waterline as center
     if (toolSettings.showHorizontalLines && toolSettings.lineCount > 0) {
-      const waterlinePos = toolSettings.waterlinePosition || 38;
+      const waterlinePos = toolSettings.waterlinePosition || 34.7;
 
       // Always include waterline as one of the lines
       lines.push({
@@ -27,40 +27,45 @@ const ReferenceLines: React.FC = () => {
         thickness: toolSettings.lineThickness,
       });
 
-      // Calculate remaining lines to distribute above and below waterline
+      // Calculate remaining lines to distribute above and below waterline with equal spacing
       const remainingLines = toolSettings.lineCount - 1;
       if (remainingLines > 0) {
         const linesAbove = Math.floor(remainingLines / 2);
         const linesBelow = Math.ceil(remainingLines / 2);
 
-        // Space above waterline: 0 to waterlinePos
-        const spaceAbove = waterlinePos;
-        const stepAbove = spaceAbove / (linesAbove + 1);
+        // Calculate uniform spacing from waterline
+        // Use the maximum available space to determine spacing
+        const maxSpaceAbove = waterlinePos;
+        const maxSpaceBelow = 100 - waterlinePos;
+        const maxLines = Math.max(linesAbove, linesBelow);
+        const spacing = Math.min(maxSpaceAbove / linesAbove, maxSpaceBelow / linesBelow);
 
-        // Space below waterline: waterlinePos to 100
-        const spaceBelow = 100 - waterlinePos;
-        const stepBelow = spaceBelow / (linesBelow + 1);
-
-        // Add lines above waterline
+        // Add lines above waterline with equal spacing
         for (let i = 1; i <= linesAbove; i++) {
-          lines.push({
-            id: `h-line-above-${i}`,
-            type: 'horizontal',
-            position: stepAbove * i,
-            color: toolSettings.color,
-            thickness: toolSettings.lineThickness,
-          });
+          const position = waterlinePos - spacing * i;
+          if (position >= 0) {
+            lines.push({
+              id: `h-line-above-${i}`,
+              type: 'horizontal',
+              position,
+              color: toolSettings.color,
+              thickness: toolSettings.lineThickness,
+            });
+          }
         }
 
-        // Add lines below waterline
+        // Add lines below waterline with equal spacing
         for (let i = 1; i <= linesBelow; i++) {
-          lines.push({
-            id: `h-line-below-${i}`,
-            type: 'horizontal',
-            position: waterlinePos + stepBelow * i,
-            color: toolSettings.color,
-            thickness: toolSettings.lineThickness,
-          });
+          const position = waterlinePos + spacing * i;
+          if (position <= 100) {
+            lines.push({
+              id: `h-line-below-${i}`,
+              type: 'horizontal',
+              position,
+              color: toolSettings.color,
+              thickness: toolSettings.lineThickness,
+            });
+          }
         }
       }
     }
@@ -84,7 +89,7 @@ const ReferenceLines: React.FC = () => {
 
   // Waterline adjustment functions
   const adjustWaterline = (delta: number) => {
-    const currentPos = toolSettings.waterlinePosition || 34;
+    const currentPos = toolSettings.waterlinePosition || 34.7;
     const newPos = Math.max(0, Math.min(100, currentPos + delta));
     updateToolSettings({ waterlinePosition: newPos });
   };
@@ -227,7 +232,7 @@ const ReferenceLines: React.FC = () => {
           <div className="bg-blue-50 p-3 rounded-xl space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-700">
-                위치: <span className="font-bold text-blue-600">{(toolSettings.waterlinePosition || 38).toFixed(1)}%</span>
+                위치: <span className="font-bold text-blue-600">{(toolSettings.waterlinePosition || 34.7).toFixed(1)}%</span>
               </span>
               <span className="text-xs text-gray-500">중심 기준선</span>
             </div>

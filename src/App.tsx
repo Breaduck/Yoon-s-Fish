@@ -43,6 +43,12 @@ function AppContent() {
   // Handle ESC/BACKSPACE/DELETE to remove last added annotation in order
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore if typing in input/textarea
+      const target = e.target as HTMLElement;
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+        return;
+      }
+
       if (e.key === 'Escape' || e.key === 'Backspace' || e.key === 'Delete') {
         // Find the most recent annotation across all types
         let mostRecent: { type: 'arrow' | 'drawing' | 'angle'; id: string; createdAt: number } | null = null;
@@ -76,12 +82,20 @@ function AppContent() {
             removeAngle(mostRecent.id);
           }
         }
+      } else if (e.key === ' ') {
+        // Toggle play/pause with spacebar
+        e.preventDefault();
+        if (videoState.isPlaying) {
+          pauseVideo1();
+        } else {
+          playVideo1();
+        }
       }
     };
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [annotations, removeArrow, removeFreeDraw, removeAngle]);
+  }, [annotations, removeArrow, removeFreeDraw, removeAngle, videoState.isPlaying, playVideo1, pauseVideo1]);
 
   return (
           <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50">
