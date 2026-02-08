@@ -16,18 +16,23 @@ const VideoControls: React.FC<VideoControlsProps> = ({ videoIndex = 0 }) => {
   const [customSpeed, setCustomSpeed] = useState('');
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
   const speedMenuRef = useRef<HTMLDivElement>(null);
+  const progressRef = useRef<HTMLInputElement>(null);
 
   const currentVideoRef = videoIndex === 0 ? videoRef : videoRef2;
+  const fps = 30; // Default fps for frame snapping
 
-  // Update time from video element
+  // Update time from video element (only when not dragging)
   useEffect(() => {
     const video = currentVideoRef.current;
     if (!video) return;
 
     const updateTime = () => {
-      setCurrentTime(video.currentTime || 0);
-      setDuration(video.duration || 0);
+      if (!isDragging) {
+        setCurrentTime(video.currentTime || 0);
+        setDuration(video.duration || 0);
+      }
     };
 
     video.addEventListener('timeupdate', updateTime);
@@ -39,7 +44,18 @@ const VideoControls: React.FC<VideoControlsProps> = ({ videoIndex = 0 }) => {
       video.removeEventListener('loadedmetadata', updateTime);
       video.removeEventListener('durationchange', updateTime);
     };
-  }, [currentVideoRef]);
+  }, [currentVideoRef, isDragging]);
+
+  const handleProgressChange = (value: number) => {
+    if (!currentVideoRef.current || !duration) return;
+
+    // Snap to frame
+    const frameTime = 1 / fps;
+    const frameNumber = Math.round(value / frameTime);
+    const snappedTime = frameNumber * frameTime;
+
+    currentVideoRef.current.currentTime = Math.max(0, Math.min(duration, snappedTime));
+  };
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -90,9 +106,10 @@ const VideoControls: React.FC<VideoControlsProps> = ({ videoIndex = 0 }) => {
   };
 
   const formatTime = (seconds: number) => {
+    if (!isFinite(seconds)) return '0:00.00';
     const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+    const secs = (seconds % 60).toFixed(2);
+    return `${mins}:${secs.padStart(5, '0')}`;
   };
 
   if (!videoState.source) return null;
@@ -105,16 +122,18 @@ const VideoControls: React.FC<VideoControlsProps> = ({ videoIndex = 0 }) => {
           {formatTime(currentTime)}
         </div>
         <input
+          ref={progressRef}
           type="range"
           min="0"
           max={duration || 100}
+          step="0.001"
           value={currentTime}
-          onChange={(e) => {
-            if (currentVideoRef.current) {
-              currentVideoRef.current.currentTime = parseFloat(e.target.value);
-            }
-          }}
-          className="flex-1 h-1 bg-white/30 rounded-full appearance-none cursor-pointer accent-blue-500"
+          onMouseDown={() => setIsDragging(true)}
+          onMouseUp={() => setIsDragging(false)}
+          onTouchStart={() => setIsDragging(true)}
+          onTouchEnd={() => setIsDragging(false)}
+          onChange={(e) => handleProgressChange(parseFloat(e.target.value))}
+          className="flex-1 h-2 bg-white/30 rounded-full appearance-none cursor-pointer accent-blue-500"
           style={{
             backgroundImage: `linear-gradient(to right, rgb(59, 130, 246) 0%, rgb(59, 130, 246) ${duration > 0 ? (currentTime / duration) * 100 : 0}%, rgba(255,255,255,0.3) ${duration > 0 ? (currentTime / duration) * 100 : 0}%, rgba(255,255,255,0.3) 100%)`
           }}

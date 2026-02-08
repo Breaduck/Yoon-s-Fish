@@ -8,7 +8,6 @@ import VideoPlayer2 from './components/video/VideoPlayer2';
 import VideoCanvas from './components/video/VideoCanvas';
 import VideoCanvas2 from './components/video/VideoCanvas2';
 import VideoControls from './components/video/VideoControls';
-import FrameScrubber from './components/video/FrameScrubber';
 import FullscreenPlayer from './components/video/FullscreenPlayer';
 import ToolPanel from './components/tools/ToolPanel';
 import ClipPanel from './components/clips/ClipPanel';
@@ -247,8 +246,6 @@ function AppContent() {
                             <VideoControls videoIndex={0} />
                           </div>
                         </div>
-                        {/* Frame scrubber */}
-                        <FrameScrubber videoIndex={0} />
 
                         </div>
 
@@ -301,8 +298,6 @@ function AppContent() {
                             <VideoControls videoIndex={1} />
                           </div>
                         </div>
-                        {/* Frame scrubber */}
-                        <FrameScrubber videoIndex={1} />
                         </div>
                       </div>
                       </div>
