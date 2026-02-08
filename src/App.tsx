@@ -146,7 +146,7 @@ function AppContent() {
             {/* Main content */}
             <div className="flex gap-4 px-4 py-6">
               {/* Tool panel - left */}
-              <aside style={{ width: '180px', flexShrink: 0 }}>
+              <aside style={{ width: '135px', flexShrink: 0 }}>
                 <ToolPanel />
               </aside>
 
