@@ -60,7 +60,7 @@ export const ToolProvider: React.FC<ToolProviderProps> = ({ children }) => {
   };
 
   const [toolSettings, setToolSettings] = useState<ToolSettings>({
-    color: '#eab308', // yellow
+    color: '#10b981', // emerald
     thickness: 8,
     lineCount: 7,
     verticalLineCount: 1,
@@ -79,7 +79,7 @@ export const ToolProvider: React.FC<ToolProviderProps> = ({ children }) => {
 
   const resetSettings = () => {
     setToolSettings({
-      color: '#eab308',
+      color: '#10b981',
       thickness: 8,
       lineCount: 7,
       verticalLineCount: 1,
