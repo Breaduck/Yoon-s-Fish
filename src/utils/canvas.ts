@@ -11,7 +11,7 @@ export const drawArrow = (
   thickness: number,
   style: ArrowStyle = 'solid'
 ) => {
-  const headLength = 10 + thickness * 1.2;
+  const headLength = (10 + thickness * 1.2) * 1.5;
   const angle = Math.atan2(end.y - start.y, end.x - start.x);
 
   ctx.save();

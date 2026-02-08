@@ -21,7 +21,9 @@
       "Bash(git fetch:*)",
       "Bash(git pull:*)",
       "WebFetch(domain:github.com)",
-      "WebFetch(domain:raw.githubusercontent.com)"
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(gh repo view:*)",
+      "WebFetch(domain:0b6e654a.aquaflux-lab.pages.dev)"
     ]
   }
 }
