@@ -167,9 +167,9 @@ function AppContent() {
             </header>
 
             {/* Main content */}
-            <div className="flex flex-col lg:flex-row gap-3 pl-3 pr-0 py-4 w-full max-w-none">
+            <div className="flex gap-3 pl-3 pr-0 py-4 w-full max-w-none">
               {/* Tool panel - left */}
-              <aside className="w-full lg:w-auto" style={{ flexShrink: 0 }}>
+              <aside style={{ width: '135px', flexShrink: 0 }}>
                 <ToolPanel />
               </aside>
 
@@ -356,7 +356,7 @@ function AppContent() {
                 </main>
 
               {/* Clip panel - right */}
-              <aside className="w-full lg:w-auto" style={{ flexShrink: 0 }}>
+              <aside style={{ width: '264px', flexShrink: 0 }}>
                 <ClipPanel />
               </aside>
             </div>
