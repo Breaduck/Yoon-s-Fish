@@ -107,7 +107,7 @@ function AppContent() {
   }, [annotations, removeArrow, removeFreeDraw, removeAngle, videoState.isPlaying, videoState.currentTime, videoState.duration, play, pause, seek]);
 
   return (
-          <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50 w-full max-w-none overflow-x-hidden">
+          <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50 w-screen max-w-none overflow-x-hidden m-0 p-0">
             {/* Hidden file inputs for click-to-upload */}
             <input
               ref={fileInputRef}
