@@ -14,11 +14,16 @@ export const drawArrow = (
   const headLength = (10 + thickness * 1.2) * 1.5;
   const angle = Math.atan2(end.y - start.y, end.x - start.x);
 
+  // Calculate where line should end (at triangle base)
+  const baseDistance = headLength * Math.cos(Math.PI / 6);
+  const lineEndX = end.x - baseDistance * Math.cos(angle);
+  const lineEndY = end.y - baseDistance * Math.sin(angle);
+
   ctx.save();
   ctx.strokeStyle = color;
   ctx.fillStyle = color;
   ctx.lineWidth = thickness;
-  ctx.lineCap = 'round';
+  ctx.lineCap = 'butt';
 
   // Set dash pattern for dashed arrows (scale with thickness)
   if (style === 'dashed') {
@@ -27,10 +32,10 @@ export const drawArrow = (
     ctx.setLineDash([dashLength, gapLength]);
   }
 
-  // Draw line
+  // Draw line to triangle base
   ctx.beginPath();
   ctx.moveTo(start.x, start.y);
-  ctx.lineTo(end.x, end.y);
+  ctx.lineTo(lineEndX, lineEndY);
   ctx.stroke();
 
   // Reset dash for solid elements
@@ -41,7 +46,7 @@ export const drawArrow = (
   ctx.arc(start.x, start.y, thickness * 0.8, 0, 2 * Math.PI);
   ctx.fill();
 
-  // Draw arrowhead
+  // Draw arrowhead triangle
   ctx.beginPath();
   ctx.moveTo(end.x, end.y);
   ctx.lineTo(
