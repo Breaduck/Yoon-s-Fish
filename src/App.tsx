@@ -362,8 +362,6 @@ function AppContent() {
                             <VideoControls videoIndex={0} />
                           </div>
                         </div>
-                        {/* Frame scrubber outside aspect-video */}
-                        <FrameScrubber videoIndex={0} />
                       </div>
                     )}
 
