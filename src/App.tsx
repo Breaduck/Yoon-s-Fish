@@ -96,18 +96,18 @@ function AppContent() {
           }
         }
       } else if (e.key === 'ArrowRight') {
-        // Seek forward 1 frame on last focused video
+        // Seek forward 0.05s on last focused video
         e.preventDefault();
         const video = isComparisonMode && lastFocusedVideo === 1 ? videoRef2.current : videoRef.current;
         if (video) {
-          video.currentTime = Math.min(video.duration || 0, video.currentTime + 0.033);
+          video.currentTime = Math.min(video.duration || 0, video.currentTime + 0.05);
         }
       } else if (e.key === 'ArrowLeft') {
-        // Seek backward 1 frame on last focused video
+        // Seek backward 0.05s on last focused video
         e.preventDefault();
         const video = isComparisonMode && lastFocusedVideo === 1 ? videoRef2.current : videoRef.current;
         if (video) {
-          video.currentTime = Math.max(0, video.currentTime - 0.033);
+          video.currentTime = Math.max(0, video.currentTime - 0.05);
         }
       }
     };
