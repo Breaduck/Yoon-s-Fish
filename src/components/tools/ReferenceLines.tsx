@@ -145,7 +145,7 @@ const ReferenceLines: React.FC = () => {
             </button>
             <span className="w-8 text-center text-sm font-bold text-gray-800">{toolSettings.lineThickness}</span>
             <button
-              onClick={() => updateToolSettings({ lineThickness: Math.min(6, toolSettings.lineThickness + 1) })}
+              onClick={() => updateToolSettings({ lineThickness: Math.min(12, toolSettings.lineThickness + 1) })}
               className="w-8 h-8 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-bold transition-all"
             >
               +
