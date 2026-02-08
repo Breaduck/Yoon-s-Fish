@@ -14,29 +14,55 @@ const ReferenceLines: React.FC = () => {
   useEffect(() => {
     const lines: ReferenceLine[] = [];
 
-    // Generate horizontal lines with waterline as anchor (0번)
+    // Generate horizontal lines with waterline as anchor (34.7% fixed)
     if (toolSettings.showHorizontalLines && toolSettings.lineCount > 0) {
       const WATERLINE_Y = toolSettings.waterlinePosition || 34.7;
 
-      // Calculate interval: screen height / (line count + 1)
-      const interval = 100 / (toolSettings.lineCount + 1);
+      // Always include waterline as master line (index 0)
+      lines.push({
+        id: 'waterline',
+        type: 'horizontal',
+        position: WATERLINE_Y,
+        color: toolSettings.color,
+        thickness: toolSettings.lineThickness,
+      });
 
-      // Generate lines with waterline as center anchor
-      for (let i = 0; i < toolSettings.lineCount; i++) {
-        // Calculate offset from waterline: center lines around waterline
-        const centerOffset = Math.floor(toolSettings.lineCount / 2);
-        const relativeOffset = i - centerOffset;
-        const position = WATERLINE_Y + (interval * relativeOffset);
+      // Distribute remaining lines symmetrically around waterline
+      const remainingCount = toolSettings.lineCount - 1;
+      if (remainingCount > 0) {
+        const linesAbove = Math.floor(remainingCount / 2);
+        const linesBelow = remainingCount - linesAbove;
 
-        // Only render if within screen bounds
-        if (position >= 0 && position <= 100) {
-          lines.push({
-            id: relativeOffset === 0 ? 'waterline' : `h-line-${i}`,
-            type: 'horizontal',
-            position,
-            color: toolSettings.color,
-            thickness: toolSettings.lineThickness,
-          });
+        // Calculate spacing: divide available space evenly
+        const spacingAbove = WATERLINE_Y / (linesAbove + 1);
+        const spacingBelow = (100 - WATERLINE_Y) / (linesBelow + 1);
+
+        // Add lines above waterline (from 0% toward waterline)
+        for (let i = 1; i <= linesAbove; i++) {
+          const position = spacingAbove * i;
+          if (position >= 0 && position <= 100) {
+            lines.push({
+              id: `h-line-above-${i}`,
+              type: 'horizontal',
+              position,
+              color: toolSettings.color,
+              thickness: toolSettings.lineThickness,
+            });
+          }
+        }
+
+        // Add lines below waterline (from waterline toward 100%)
+        for (let i = 1; i <= linesBelow; i++) {
+          const position = WATERLINE_Y + spacingBelow * i;
+          if (position >= 0 && position <= 100) {
+            lines.push({
+              id: `h-line-below-${i}`,
+              type: 'horizontal',
+              position,
+              color: toolSettings.color,
+              thickness: toolSettings.lineThickness,
+            });
+          }
         }
       }
     }
