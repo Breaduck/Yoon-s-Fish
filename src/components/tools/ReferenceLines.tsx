@@ -78,13 +78,35 @@ const ReferenceLines: React.FC = () => {
     setReferenceLines(lines);
   }, [toolSettings.lineCount, toolSettings.verticalLineCount, toolSettings.showHorizontalLines, toolSettings.showVerticalLines, toolSettings.color, toolSettings.lineThickness, toolSettings.waterlinePosition, toolSettings.showWaterline, setReferenceLines]);
 
-  // Removed touch/click waterline setting - using fine adjustment buttons only
+  // Waterline adjustment functions
   const adjustWaterline = (delta: number) => {
     const currentPos = toolSettings.waterlinePosition || 34;
     const newPos = Math.max(0, Math.min(100, currentPos + delta));
     updateToolSettings({ waterlinePosition: newPos, showWaterline: true });
     localStorage.setItem('aquaflux_waterline', JSON.stringify({ yPercent: newPos }));
   };
+
+  // Handle waterline click on video
+  useEffect(() => {
+    if (!isSettingWaterline) return;
+
+    const handleClick = (e: MouseEvent) => {
+      const video = videoRef.current;
+      if (!video) return;
+
+      const rect = video.getBoundingClientRect();
+      const clickY = e.clientY - rect.top;
+      const yPercent = Math.max(0, Math.min(100, (clickY / rect.height) * 100));
+
+      updateToolSettings({ waterlinePosition: yPercent, showWaterline: true });
+      localStorage.setItem('aquaflux_waterline', JSON.stringify({ yPercent }));
+
+      setIsSettingWaterline(false);
+    };
+
+    document.addEventListener('click', handleClick);
+    return () => document.removeEventListener('click', handleClick);
+  }, [isSettingWaterline, videoRef, updateToolSettings]);
 
   return (
     <div className="space-y-5 pt-5 border-t border-gray-200">
@@ -183,10 +205,22 @@ const ReferenceLines: React.FC = () => {
         </div>
       )}
 
-      {/* Waterline Section - Fixed at 34% with fine adjustment */}
+      {/* Waterline Section - Default 34% with manual selection */}
       <div className="pt-3 border-t border-gray-200">
         <div className="space-y-3">
-          <label className="text-sm font-semibold text-gray-700">수면 기준선 (고정)</label>
+          <div className="flex items-center justify-between">
+            <label className="text-sm font-semibold text-gray-700">수면 기준선</label>
+            <button
+              onClick={() => setIsSettingWaterline(true)}
+              className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${
+                isSettingWaterline
+                  ? 'bg-cyan-500 text-white'
+                  : 'bg-cyan-100 hover:bg-cyan-200 text-cyan-700'
+              }`}
+            >
+              {isSettingWaterline ? '→ 영상 클릭' : '위치 선택'}
+            </button>
+          </div>
 
           <div className="bg-blue-50 p-3 rounded-xl space-y-3">
             <div className="flex items-center justify-between">

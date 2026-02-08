@@ -136,8 +136,8 @@ function AppContent() {
                       <VideoUpload isSecondVideo={true} />
                     </>
                   )}
-                  <CameraCapture />
                   <LiveCameraSelect />
+                  <CameraCapture />
                   <ExportDialog />
                 </div>
               </div>
