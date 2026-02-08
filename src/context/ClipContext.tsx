@@ -8,6 +8,9 @@ interface ClipContextType {
   updateClipTitle: (id: string, title: string) => void;
   selectedClip: Clip | null;
   setSelectedClip: (clip: Clip | null) => void;
+  selectedClips: string[];
+  toggleClipSelection: (id: string) => void;
+  clearSelection: () => void;
 }
 
 const ClipContext = createContext<ClipContextType | null>(null);
@@ -27,6 +30,7 @@ interface ClipProviderProps {
 export const ClipProvider: React.FC<ClipProviderProps> = ({ children }) => {
   const [clips, setClips] = useState<Clip[]>([]);
   const [selectedClip, setSelectedClip] = useState<Clip | null>(null);
+  const [selectedClips, setSelectedClips] = useState<string[]>([]);
 
   const addClip = (clip: Clip) => {
     setClips((prev) => [...prev, clip]);
@@ -37,12 +41,23 @@ export const ClipProvider: React.FC<ClipProviderProps> = ({ children }) => {
     if (selectedClip?.id === id) {
       setSelectedClip(null);
     }
+    setSelectedClips((prev) => prev.filter((clipId) => clipId !== id));
   };
 
   const updateClipTitle = (id: string, title: string) => {
     setClips((prev) =>
       prev.map((c) => (c.id === id ? { ...c, title } : c))
     );
+  };
+
+  const toggleClipSelection = (id: string) => {
+    setSelectedClips((prev) =>
+      prev.includes(id) ? prev.filter((clipId) => clipId !== id) : [...prev, id]
+    );
+  };
+
+  const clearSelection = () => {
+    setSelectedClips([]);
   };
 
   return (
@@ -54,6 +69,9 @@ export const ClipProvider: React.FC<ClipProviderProps> = ({ children }) => {
         updateClipTitle,
         selectedClip,
         setSelectedClip,
+        selectedClips,
+        toggleClipSelection,
+        clearSelection,
       }}
     >
       {children}

@@ -2,7 +2,7 @@ import React, { useRef, useEffect } from 'react';
 import { VideoProvider, useVideo } from './context/VideoContext';
 import { AnnotationProvider, useAnnotations } from './context/AnnotationContext';
 import { ToolProvider, useTool } from './context/ToolContext';
-import { ClipProvider } from './context/ClipContext';
+import { ClipProvider, useClips } from './context/ClipContext';
 import VideoPlayer from './components/video/VideoPlayer';
 import VideoPlayer2 from './components/video/VideoPlayer2';
 import VideoCanvas from './components/video/VideoCanvas';
@@ -21,6 +21,7 @@ function AppContent() {
   const { isComparisonMode, setIsComparisonMode } = useTool();
   const { videoState, secondVideoSource, setSource, setSource2, clearSource, clearSource2, play, pause, seek, playVideo1, pauseVideo1, playVideo2, pauseVideo2, playBoth } = useVideo();
   const { annotations, removeArrow, removeFreeDraw, removeAngle } = useAnnotations();
+  const { clips } = useClips();
 
   // Hidden file inputs for click-to-upload
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -177,7 +178,24 @@ function AppContent() {
                   <div className="space-y-5 w-full">
                     {/* Video player container */}
                     {isComparisonMode ? (
-                      <div className="bg-white rounded-3xl overflow-hidden aspect-video relative flex gap-3 p-3 shadow-xl">
+                      <div
+                        className="bg-white rounded-3xl overflow-hidden aspect-video relative flex gap-3 p-3 shadow-xl"
+                        onDragOver={(e) => e.preventDefault()}
+                        onDrop={(e) => {
+                          e.preventDefault();
+                          const clipId = e.dataTransfer.getData('clipId');
+                          const clip = clips.find(c => c.id === clipId);
+                          if (clip) {
+                            const rect = e.currentTarget.getBoundingClientRect();
+                            const x = e.clientX - rect.left;
+                            if (x < rect.width / 2) {
+                              setSource({ type: 'file', url: clip.url });
+                            } else {
+                              setSource2({ type: 'file', url: clip.url });
+                            }
+                          }
+                        }}
+                      >
                         {/* Before Video - Left */}
                         <div
                           className="flex-1 relative bg-black rounded-2xl overflow-hidden"
@@ -282,6 +300,15 @@ function AppContent() {
                           className="bg-black aspect-video relative"
                           onMouseEnter={() => setShowControls(true)}
                           onMouseLeave={() => setShowControls(false)}
+                          onDragOver={(e) => e.preventDefault()}
+                          onDrop={(e) => {
+                            e.preventDefault();
+                            const clipId = e.dataTransfer.getData('clipId');
+                            const clip = clips.find(c => c.id === clipId);
+                            if (clip) {
+                              setSource({ type: 'file', url: clip.url });
+                            }
+                          }}
                         >
                           {/* X button to clear video */}
                           {videoState.source && (

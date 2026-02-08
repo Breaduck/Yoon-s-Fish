@@ -3,11 +3,23 @@ import { useClips } from '../../context/ClipContext';
 import { useVideo } from '../../context/VideoContext';
 
 const ClipPanel: React.FC = () => {
-  const { clips, removeClip, updateClipTitle, selectedClip, setSelectedClip } = useClips();
+  const { clips, removeClip, updateClipTitle, selectedClip, setSelectedClip, selectedClips, toggleClipSelection, clearSelection } = useClips();
   const { setSource } = useVideo();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState('');
+
+  const handleDownloadSelected = () => {
+    selectedClips.forEach(clipId => {
+      const clip = clips.find(c => c.id === clipId);
+      if (clip) {
+        const a = document.createElement('a');
+        a.href = clip.url;
+        a.download = `${clip.title}.webm`;
+        a.click();
+      }
+    });
+  };
 
   const handleClipClick = (clip: typeof clips[0]) => {
     setSelectedClip(clip);
@@ -28,14 +40,32 @@ const ClipPanel: React.FC = () => {
 
   return (
     <div className="w-full bg-white rounded-l-3xl rounded-r-none p-4 shadow-xl">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-bold text-gray-800">클립</h2>
-        <button
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm rounded-xl font-semibold transition-all"
-        >
-          {isCollapsed ? '›' : '‹'}
-        </button>
+      <div className="mb-4">
+        <div className="flex items-center justify-between mb-2">
+          <h2 className="text-xl font-bold text-gray-800">클립</h2>
+          <button
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm rounded-xl font-semibold transition-all"
+          >
+            {isCollapsed ? '›' : '‹'}
+          </button>
+        </div>
+        {selectedClips.length > 0 && (
+          <div className="flex gap-2">
+            <button
+              onClick={handleDownloadSelected}
+              className="flex-1 px-3 py-1.5 bg-blue-500 hover:bg-blue-600 text-white text-xs rounded-lg font-semibold transition-all"
+            >
+              다운로드 ({selectedClips.length})
+            </button>
+            <button
+              onClick={clearSelection}
+              className="px-3 py-1.5 bg-gray-500 hover:bg-gray-600 text-white text-xs rounded-lg font-semibold transition-all"
+            >
+              선택 해제
+            </button>
+          </div>
+        )}
       </div>
 
       {!isCollapsed && (
@@ -48,6 +78,11 @@ const ClipPanel: React.FC = () => {
             clips.map((clip, index) => (
               <div
                 key={clip.id}
+                draggable
+                onDragStart={(e) => {
+                  e.dataTransfer.setData('clipId', clip.id);
+                  e.dataTransfer.effectAllowed = 'copy';
+                }}
                 className={`p-3 rounded-xl cursor-pointer transition-all ${
                   selectedClip?.id === clip.id
                     ? 'bg-blue-100 border-2 border-blue-500'
@@ -57,6 +92,13 @@ const ClipPanel: React.FC = () => {
                 onDoubleClick={() => handleDoubleClick(clip)}
               >
                 <div className="flex items-center justify-between">
+                  <input
+                    type="checkbox"
+                    checked={selectedClips.includes(clip.id)}
+                    onChange={() => toggleClipSelection(clip.id)}
+                    onClick={(e) => e.stopPropagation()}
+                    className="w-4 h-4 accent-blue-500 rounded mr-2"
+                  />
                   <div className="flex-1">
                     {editingId === clip.id ? (
                       <input
