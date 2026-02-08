@@ -244,7 +244,7 @@ const ReferenceLines: React.FC = () => {
 
       <div>
         <label className="block text-sm font-semibold text-gray-700 mb-3">색상</label>
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-4 gap-2 mb-3">
           {COLOR_OPTIONS.map((color) => (
             <button
               key={color.value}
@@ -258,6 +258,15 @@ const ReferenceLines: React.FC = () => {
               title={color.label}
             />
           ))}
+        </div>
+        <div className="flex items-center gap-2">
+          <input
+            type="color"
+            value={toolSettings.color}
+            onChange={(e) => updateToolSettings({ color: e.target.value })}
+            className="w-10 h-10 rounded-lg cursor-pointer border-2 border-gray-300"
+          />
+          <span className="text-xs font-mono text-gray-600">{toolSettings.color}</span>
         </div>
       </div>
     </div>
