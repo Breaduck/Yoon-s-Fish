@@ -86,17 +86,6 @@ const ToolPanel: React.FC = () => {
         </button>
 
         <button
-          onClick={() => setActiveTool(activeTool === 'eraser' ? null : 'eraser')}
-          className={`w-full px-5 py-3.5 rounded-xl text-left font-semibold transition-all ${
-            activeTool === 'eraser'
-              ? 'bg-gradient-to-r from-red-500 to-pink-500 text-white shadow-lg shadow-red-500/30'
-              : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
-          }`}
-        >
-          지우개
-        </button>
-
-        <button
           onClick={() => setActiveTool(activeTool === 'angle' ? null : 'angle')}
           className={`w-full px-5 py-3.5 rounded-xl text-left font-semibold transition-all ${
             activeTool === 'angle'
@@ -105,6 +94,17 @@ const ToolPanel: React.FC = () => {
           }`}
         >
           각도기
+        </button>
+
+        <button
+          onClick={() => setActiveTool(activeTool === 'eraser' ? null : 'eraser')}
+          className={`w-full px-5 py-3.5 rounded-xl text-left font-semibold transition-all ${
+            activeTool === 'eraser'
+              ? 'bg-gradient-to-r from-red-500 to-pink-500 text-white shadow-lg shadow-red-500/30'
+              : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+          }`}
+        >
+          지우개
         </button>
       </div>
 
