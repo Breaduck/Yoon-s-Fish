@@ -27,7 +27,7 @@ const ClipPanel: React.FC = () => {
   };
 
   return (
-    <div className="w-64 bg-white rounded-3xl p-4 shadow-xl">
+    <div className="w-64 bg-white rounded-l-3xl rounded-r-none p-4 shadow-xl">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-bold text-gray-800">클립</h2>
         <button
